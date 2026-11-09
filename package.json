@@ -3,11 +3,6 @@
   "name": "menyarwanda",
   "version": "1.0.0",
   "private": true,
-  "description": "MENYARWANDA Agriculture and Driving Laws Learning Platform",
-  "main": "api/login.js",
-  "scripts": {
-    "start": "node server.js"
-  },
   "dependencies": {
     "@libsql/client": "^0.15.15",
     "bcryptjs": "^2.4.3",
