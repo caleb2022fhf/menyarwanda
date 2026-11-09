@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MENYARWANDA - Learn Agriculture and Driving Laws">
+    <title>MENYARWANDA | Learn Every Day</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #080808;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: #171717;
+            border: 1px solid #303030;
+            border-radius: 17px;
+            padding: 30px;
+        }
+
+        .logo {
+            width: 52px;
+            height: 52px;
+            background: #10382d;
+            border: 1px solid #009d70;
+            color: #00d69a;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 23px;
+            font-weight: bold;
+            margin: 0 auto 15px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 23px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #bbb;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            height: 44px;
+            background: #050505;
+            border: 1px solid #333;
+            border-radius: 12px;
+            color: white;
+            padding: 0 13px;
+            outline: none;
+            font-size: 13px;
+        }
+
+        input:focus, select:focus {
+            border-color: #00c98c;
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            height: auto;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: #009d70;
+            color: white;
+            border: none;
+            border-radius: 7px;
+            padding: 7px 12px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .main-btn {
+            width: 100%;
+            height: 44px;
+            background: #009d70;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .3s;
+        }
+
+        .main-btn:hover {
+            background: #00b986;
+        }
+
+        .switch {
+            text-align: center;
+            color: #aaa;
+            font-size: 12px;
+            margin-top: 25px;
+        }
+
+        .switch span {
+            color: #00d69a;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .switch span:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .message {
+            text-align: center;
+            color: #00d69a;
+            font-size: 12px;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
+        #preview {
+            display: none;
+            width: 65px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid #00c98c;
+            margin: 12px auto;
+        }
+
+        @media(max-width: 400px) {
+            .container {
+                padding: 23px 19px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <div class="logo">M</div>
+
+        <!-- LOGIN PAGE -->
+
+        <section id="loginSection">
+
+            <h1>MENYARWANDA</h1>
+
+            <p class="subtitle">
+                Injira muri konte yawe yo kwiga
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label>Izina ry'Umukoresha cyangwa Email</label>
+
+                    <input
+                        type="text"
+                        name="identity"
+                        placeholder="Andika izina ryawe..."
+                        autocomplete="username"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ijambo ry'ibanga (Password)</label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Andika password..."
+                        autocomplete="current-password"
+                        required>
+                </div>
+
+                <button class="main-btn" type="submit">
+                    Injira (Login)
+                </button>
+
+            </form>
+
+            <p class="switch">
+                Nta konti ufite?
+                <span id="showRegister">Fungura Konti</span>
+            </p>
+
+        </section>
+
+
+        <!-- REGISTRATION PAGE -->
+
+        <section id="registerSection" class="hidden">
+
+            <h1>MENYARWANDA</h1>
+
+            <p class="subtitle">
+                Fungura konti nshya yo kwiga
+            </p>
+
+            <form id="registerForm">
+
+                <div class="form-group">
+                    <label>Izina ry'Umukoresha (Username)</label>
+
+                    <input
+                        type="text"
+                        name="username"
+                        placeholder="Andika izina ryawe..."
+                        minlength="3"
+                        maxlength="40"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>Imeyili (Email Address)</label>
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Andika email yawe..."
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>Ijambo ry'ibanga (Password)</label>
+
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Hitamo password..."
+                        minlength="8"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label>Hitamo Ishami ry'Isomo</label>
+
+                    <select name="category" required>
+                        <option value="">Hitamo ishami...</option>
+                        <option value="Agriculture">
+                            Ubuhinzi (Agriculture)
+                        </option>
+                        <option value="Driving Laws">
+                            Amategeko yo gutwara ibinyabiziga (Driving Laws)
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto y'Umwirondoro</label>
+
+                    <input
+                        type="file"
+                        id="profilePicture"
+                        accept="image/png,image/jpeg,image/webp"
+                        required>
+
+                    <img id="preview" alt="Profile preview">
+                </div>
+
+                <button class="main-btn" type="submit">
+                    Emeza Kwiyandikisha (Sign Up)
+                </button>
+
+            </form>
+
+            <p class="switch">
+                Usanzwe ufite konti?
+                <span id="showLogin">Injira hano</span>
+            </p>
+
+        </section>
+
+        <p class="message" id="message"></p>
+
+    </main>
+
+
+    <script>
+
+        // GET PAGE ELEMENTS
+
+        const loginSection = document.getElementById("loginSection");
+        const registerSection = document.getElementById("registerSection");
+        const message = document.getElementById("message");
+
+        // SHOW REGISTRATION
+
+        document.getElementById("showRegister").addEventListener("click", function() {
+
+            loginSection.classList.add("hidden");
+            registerSection.classList.remove("hidden");
+
+            message.textContent = "";
+
+        });
+
+        // SHOW LOGIN
+
+        document.getElementById("showLogin").addEventListener("click", function() {
+
+            registerSection.classList.add("hidden");
+            loginSection.classList.remove("hidden");
+
+            message.textContent = "";
+
+        });
+
+        // PROFILE IMAGE PREVIEW
+
+        const profilePicture = document.getElementById("profilePicture");
+        const preview = document.getElementById("preview");
+
+        profilePicture.addEventListener("change", function() {
+
+            const file = this.files[0];
+
+            if (!file) {
+                preview.style.display = "none";
+                return;
+            }
+
+            if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+                this.value = "";
+                preview.style.display = "none";
+                message.textContent = "Hitamo ifoto ya JPG, PNG cyangwa WEBP.";
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                this.value = "";
+                preview.style.display = "none";
+                message.textContent = "Ifoto igomba kuba munsi ya 5MB.";
+                return;
+            }
+
+            preview.src = URL.createObjectURL(file);
+            preview.style.display = "block";
+
+            message.textContent = "";
+
+        });
+
+        // TEMPORARY LOGIN FORM
+
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            message.textContent =
+                "Login izahuzwa na backend na Turso mu ntambwe ikurikira.";
+
+        });
+
+        // TEMPORARY REGISTRATION FORM
+
+        document.getElementById("registerForm").addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            message.textContent =
+                "Kwiyandikisha tuzabihuza na Turso mu ntambwe ikurikira.";
+
+        });
+
+    </script>
+
+</body>
+</html>
