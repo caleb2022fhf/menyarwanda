@@ -1,0 +1,406 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MENYARWANDA | Control Room</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #080808;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        header {
+            background: #171717;
+            border-bottom: 1px solid #333;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        header h2 {
+            font-size: 19px;
+        }
+
+        header span {
+            color: #00d69a;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1150px;
+            margin: 30px auto;
+        }
+
+        .welcome {
+            background: #171717;
+            border: 1px solid #333;
+            padding: 22px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+        }
+
+        .welcome p {
+            color: #aaa;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat p {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .stat h2 {
+            color: #00d69a;
+            font-size: 30px;
+            margin-top: 12px;
+        }
+
+        .students {
+            background: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .students-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        input {
+            background: #050505;
+            border: 1px solid #333;
+            border-radius: 9px;
+            color: white;
+            padding: 12px;
+            outline: none;
+            max-width: 300px;
+            width: 100%;
+        }
+
+        button {
+            background: #009d70;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #00b986;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 720px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid #333;
+            font-size: 12px;
+        }
+
+        th {
+            color: #00d69a;
+            background: #101010;
+        }
+
+        td {
+            color: #ddd;
+        }
+
+        .student-image {
+            width: 38px;
+            height: 38px;
+            object-fit: cover;
+            border-radius: 50%;
+            background: #333;
+        }
+
+        .category {
+            background: #10382d;
+            color: #00d69a;
+            padding: 6px 9px;
+            border-radius: 5px;
+            font-size: 11px;
+        }
+
+        #status {
+            color: #aaa;
+            font-size: 13px;
+            margin: 15px 0;
+        }
+
+        .error {
+            color: #ff6969 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h2>MENYARWANDA <span>CONTROL ROOM</span></h2>
+    <button id="refreshButton">↻ Refresh Students</button>
+</header>
+
+<main class="container">
+
+    <section class="welcome">
+        <h2>Welcome, Administrator</h2>
+        <p>Manage and monitor all registered MENYARWANDA students.</p>
+    </section>
+
+    <section class="stats">
+
+        <div class="stat">
+            <p>Total Registered Students</p>
+            <h2 id="totalStudents">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Agriculture Students</p>
+            <h2 id="agricultureStudents">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Driving Laws Students</p>
+            <h2 id="drivingStudents">0</h2>
+        </div>
+
+    </section>
+
+    <section class="students">
+
+        <div class="students-top">
+            <h3>Registered Students</h3>
+            <input
+                type="search"
+                id="searchInput"
+                placeholder="Search username or email...">
+        </div>
+
+        <p id="status">Loading students...</p>
+
+        <div class="table-wrap">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>PHOTO</th>
+                        <th>USERNAME</th>
+                        <th>EMAIL</th>
+                        <th>CATEGORY</th>
+                        <th>REGISTERED</th>
+                    </tr>
+                </thead>
+
+                <tbody id="studentTable"></tbody>
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script>
+
+    let students = [];
+
+    const status = document.getElementById("status");
+    const table = document.getElementById("studentTable");
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;"
+        })[character]);
+    }
+
+    function displayStudents(list) {
+
+        table.replaceChildren();
+
+        list.forEach(student => {
+
+            const row = document.createElement("tr");
+
+            const imageCell = document.createElement("td");
+            const img = document.createElement("img");
+
+            img.className = "student-image";
+            img.alt = "Student profile";
+
+            if (
+                typeof student.profileImage === "string" &&
+                /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(student.profileImage)
+            ) {
+                img.src = student.profileImage;
+            } else {
+                img.src = "data:image/svg+xml," + encodeURIComponent(
+                    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="#333"/><text x="20" y="26" text-anchor="middle" fill="white" font-size="18">?</text></svg>'
+                );
+            }
+
+            imageCell.appendChild(img);
+
+            const username = document.createElement("td");
+            username.textContent = student.username;
+
+            const email = document.createElement("td");
+            email.textContent = student.email;
+
+            const category = document.createElement("td");
+            const badge = document.createElement("span");
+
+            badge.className = "category";
+            badge.textContent = student.category;
+
+            category.appendChild(badge);
+
+            const date = document.createElement("td");
+
+            const parsedDate = new Date(
+                String(student.createdAt).replace(" ", "T") + "Z"
+            );
+
+            date.textContent = Number.isNaN(parsedDate.getTime())
+                ? student.createdAt
+                : parsedDate.toLocaleString();
+
+            row.append(
+                imageCell,
+                username,
+                email,
+                category,
+                date
+            );
+
+            table.appendChild(row);
+
+        });
+
+        document.getElementById("totalStudents").textContent =
+            list.length;
+
+        document.getElementById("agricultureStudents").textContent =
+            list.filter(s => s.category === "Agriculture").length;
+
+        document.getElementById("drivingStudents").textContent =
+            list.filter(s => s.category === "Driving Laws").length;
+    }
+
+    async function loadStudents() {
+
+        status.classList.remove("error");
+        status.textContent = "Loading students...";
+        table.replaceChildren();
+
+        try {
+
+            const response = await fetch("/api/admin/users", {
+                method: "GET",
+                credentials: "same-origin",
+                cache: "no-store"
+            });
+
+            const data = await response.json();
+
+            if (response.status === 403) {
+                window.location.replace("/index.html");
+                return;
+            }
+
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || data.error || "Unable to load students.");
+            }
+
+            students = data.students || [];
+
+            displayStudents(students);
+
+            status.textContent =
+                students.length + " student(s) loaded from Turso.";
+
+        } catch (error) {
+
+            console.error("CONTROL ROOM ERROR:", error);
+
+            status.textContent = "ERROR: " + error.message;
+            status.classList.add("error");
+
+        }
+    }
+
+    document.getElementById("refreshButton").addEventListener(
+        "click",
+        loadStudents
+    );
+
+    document.getElementById("searchInput").addEventListener(
+        "input",
+        function() {
+
+            const query = this.value.toLowerCase();
+
+            const filtered = students.filter(student =>
+                student.username.toLowerCase().includes(query) ||
+                student.email.toLowerCase().includes(query) ||
+                student.category.toLowerCase().includes(query)
+            );
+
+            displayStudents(filtered);
+        }
+    );
+
+    loadStudents();
+
+</script>
+
+</body>
+</html>
