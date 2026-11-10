@@ -1,4 +1,4 @@
-const { initializeDatabase } = require("../../lib/menya.js");
+const { getDatabase, initializeDatabase } = require("../../lib/menya.js");
 
 function response(res, status, data) {
   return res.status(status).json(data);
@@ -9,7 +9,15 @@ module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
 
   try {
-    const db = await initializeDatabase();
+    // 1. Banza wemeze ko tables zibaho
+    await initializeDatabase();
+    
+    // 2. Fata database connection nyayo ikora neza
+    const db = getDatabase();
+
+    if (!db || typeof db.execute !== "function") {
+      throw new Error("Database connection is not initialized properly.");
+    }
 
     // 1. GET: Gusoma amasomo yose
     if (req.method === "GET") {
