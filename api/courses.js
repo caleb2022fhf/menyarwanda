@@ -1,15 +1,14 @@
-import { initializeDatabase } from "../../lib/menya.js";
+const { initializeDatabase } = require("../../lib/menya.js");
 
 function response(res, status, data) {
   return res.status(status).json(data);
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   res.setHeader("Content-Type", "application/json; charset=utf-8");
   res.setHeader("Cache-Control", "no-store");
 
   try {
-    // Guhamagara initializeDatabase no kuyifata nka db connection nyayo
     const db = await initializeDatabase();
 
     // 1. GET: Gusoma amasomo yose
@@ -133,4 +132,4 @@ export default async function handler(req, res) {
       error: error.message || "Server error while managing courses."
     });
   }
-}
+};
