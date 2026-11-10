@@ -1,4 +1,3 @@
-
 import { db, initializeDatabase } from "../../lib/menya.js";
 
 function response(res, status, data) {
@@ -12,6 +11,7 @@ export default async function handler(req, res) {
   try {
     await initializeDatabase();
 
+    // 1. GET: Gusoma amasomo yose
     if (req.method === "GET") {
       const result = await db.execute({
         sql: "SELECT * FROM courses ORDER BY created_at DESC",
@@ -24,13 +24,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // 2. POST: Gushyiraho isomo rishya
     if (req.method === "POST") {
       const { title, category, description, youtube_url } = req.body || {};
 
-      if (!title || !category) {
+      if (!title || !category || !youtube_url) {
         return response(res, 400, {
           success: false,
-          message: "Title and category are required."
+          error: "Title, category and YouTube URL are required."
         });
       }
 
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
           title.trim(),
           category.trim(),
           description || "",
-          youtube_url || ""
+          youtube_url.trim()
         ]
       });
 
@@ -55,13 +56,14 @@ export default async function handler(req, res) {
       });
     }
 
+    // 3. PUT: Kuvugurura isomo risanzweho
     if (req.method === "PUT") {
       const { id, title, category, description, youtube_url } = req.body || {};
 
-      if (!id || !title || !category) {
+      if (!id || !title || !category || !youtube_url) {
         return response(res, 400, {
           success: false,
-          message: "Course ID, title and category are required."
+          error: "Course ID, title, category and YouTube URL are required."
         });
       }
 
@@ -75,7 +77,7 @@ export default async function handler(req, res) {
           title.trim(),
           category.trim(),
           description || "",
-          youtube_url || "",
+          youtube_url.trim(),
           id
         ]
       });
@@ -87,13 +89,22 @@ export default async function handler(req, res) {
       });
     }
 
+    // 4. DELETE: Gusiba isomo
     if (req.method === "DELETE") {
-      const id = req.query.id || req.body?.id;
+      let id = req.query?.id || req.body?.id;
+
+      // Niba id yohererejwe muri JSON body
+      if (!id && req.body) {
+        try {
+          const bodyData = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+          id = bodyData.id;
+        } catch (e) {}
+      }
 
       if (!id) {
         return response(res, 400, {
           success: false,
-          message: "Course ID is required."
+          error: "Course ID is required."
         });
       }
 
@@ -110,18 +121,16 @@ export default async function handler(req, res) {
     }
 
     res.setHeader("Allow", "GET, POST, PUT, DELETE");
-
     return response(res, 405, {
       success: false,
-      message: "Method not allowed."
+      error: "Method not allowed."
     });
 
   } catch (error) {
     console.error("ADMIN COURSES ERROR:", error);
-
     return response(res, 500, {
       success: false,
-      message: "Server error while managing courses."
+      error: error.message || "Server error while managing courses."
     });
   }
 }
