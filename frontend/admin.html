@@ -9,9 +9,7 @@
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     background: #080d18;
@@ -96,9 +94,7 @@ body {
     flex-wrap: wrap;
 }
 
-.topbar h2 {
-    font-size: 19px;
-}
+.topbar h2 { font-size: 19px; }
 
 .admin-info {
     display: flex;
@@ -123,21 +119,13 @@ body {
     cursor: pointer;
 }
 
-.content {
-    padding: 30px;
-}
+.content { padding: 30px; }
 
-.page-section {
-    display: none;
-}
+.page-section { display: none; }
 
-.page-section.active {
-    display: block;
-}
+.page-section.active { display: block; }
 
-.page-heading {
-    margin-bottom: 25px;
-}
+.page-heading { margin-bottom: 25px; }
 
 .page-heading h1 {
     font-size: 26px;
@@ -243,8 +231,166 @@ body {
     cursor: pointer;
 }
 
-#admin-message {
-    margin-bottom: 15px;
+#admin-message { margin-bottom: 15px; }
+
+/* VideoHub management styles */
+
+.video-form label {
+    display: block;
+    color: #aab7c8;
+    margin: 16px 0 7px;
+    font-size: 14px;
+}
+
+.video-form input,
+.video-form textarea {
+    width: 100%;
+    padding: 13px;
+    background: #080d18;
+    color: white;
+    border: 1px solid #34445d;
+    border-radius: 7px;
+    outline: none;
+    font: inherit;
+}
+
+.video-form input:focus,
+.video-form textarea:focus {
+    border-color: #00c8ff;
+}
+
+.video-form textarea {
+    resize: vertical;
+}
+
+.video-action {
+    border: 0;
+    border-radius: 7px;
+    padding: 11px 17px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 8px 5px 0 0;
+}
+
+.video-primary {
+    background: #00c8ff;
+    color: #080d18;
+}
+
+.video-secondary {
+    background: #26364e;
+    color: white;
+}
+
+.video-danger {
+    background: #e63946;
+    color: white;
+}
+
+.video-success {
+    background: #168653;
+    color: white;
+}
+
+.video-action:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.video-preview {
+    display: none;
+    margin-top: 20px;
+}
+
+.video-frame {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #000;
+}
+
+.video-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.video-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.video-item {
+    background: #080d18;
+    border: 1px solid #26364e;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.video-item img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+}
+
+.video-item-content { padding: 15px; }
+
+.video-item h4 {
+    color: #00c8ff;
+    margin: 0 0 9px;
+    overflow-wrap: anywhere;
+}
+
+.video-item p {
+    color: #91a0b5;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.video-status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    margin: 5px 0 10px;
+}
+
+.video-status.published {
+    background: #12432f;
+    color: #62e6a3;
+}
+
+.video-status.unpublished {
+    background: #49391a;
+    color: #ffd36a;
+}
+
+.video-message {
+    margin-top: 12px;
+    min-height: 20px;
+    font-size: 13px;
+    color: #91a0b5;
+}
+
+.video-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.video-item-actions button {
+    font-size: 12px;
+    padding: 8px 10px;
+    margin: 0;
 }
 
 @media(max-width: 850px) {
@@ -253,26 +399,18 @@ body {
         transition: .25s;
     }
 
-    .sidebar.open {
-        transform: translateX(0);
-    }
+    .sidebar.open { transform: translateX(0); }
 
     .main-area {
         width: 100%;
         margin-left: 0;
     }
 
-    .mobile-menu {
-        display: block;
-    }
+    .mobile-menu { display: block; }
 
-    .content {
-        padding: 20px 15px;
-    }
+    .content { padding: 20px 15px; }
 
-    .topbar {
-        padding: 14px 15px;
-    }
+    .topbar { padding: 14px 15px; }
 }
 </style>
 </head>
@@ -505,16 +643,110 @@ body {
                 </div>
             </section>
 
+            <!-- MENYARWANDA VIDEO MANAGEMENT -->
+
             <section class="page-section" id="page-videohub">
+
                 <button class="back-button" data-back>← Overview</button>
+
                 <div class="page-heading">
-                    <h1>VideoHub Management</h1>
-                    <p class="muted">Manage educational YouTube videos.</p>
+                    <h1>MENYARWANDA Video Management</h1>
+                    <p class="muted">
+                        Add and manage YouTube videos for MENYARWANDA.
+                        These videos are separate from the public VideoHub website.
+                    </p>
                 </div>
+
                 <div class="panel-placeholder">
-                    <h3>VideoHub</h3>
-                    <p class="muted">Video management tools will be added here.</p>
+
+                    <h3>Add New Video</h3>
+
+                    <form id="menyarwanda-video-form" class="video-form">
+
+                        <label for="video-title">Video Title</label>
+                        <input
+                            type="text"
+                            id="video-title"
+                            maxlength="200"
+                            placeholder="Enter video title"
+                            required
+                        >
+
+                        <label for="video-description">Description</label>
+                        <textarea
+                            id="video-description"
+                            rows="4"
+                            maxlength="5000"
+                            placeholder="Enter video description"
+                        ></textarea>
+
+                        <label for="video-url">YouTube URL</label>
+                        <input
+                            type="url"
+                            id="video-url"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            required
+                        >
+
+                        <div class="video-preview" id="video-preview-container">
+                            <h3>Video Preview</h3>
+                            <div class="video-frame">
+                                <iframe
+                                    id="video-preview"
+                                    src=""
+                                    title="YouTube video preview"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="video-action video-secondary"
+                            id="preview-video-btn">
+                            Preview
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="video-action video-primary"
+                            id="publish-video-btn">
+                            Publish Video
+                        </button>
+
+                        <button
+                            type="button"
+                            class="video-action video-secondary"
+                            id="cancel-edit-btn"
+                            style="display:none;">
+                            Cancel Edit
+                        </button>
+
+                        <p id="video-form-message" class="video-message"></p>
+
+                    </form>
+
                 </div>
+
+                <div class="panel-placeholder">
+                    <h3>MENYARWANDA Videos</h3>
+                    <p class="muted">
+                        Videos managed here are stored separately from public VideoHub.
+                    </p>
+
+                    <button
+                        type="button"
+                        class="video-action video-secondary"
+                        id="refresh-videos-btn">
+                        Refresh Videos
+                    </button>
+
+                    <div id="menyarwanda-video-list" class="video-list">
+                        <p class="muted">Videos will load here.</p>
+                    </div>
+                </div>
+
             </section>
 
             <section class="page-section" id="page-ai">
@@ -618,7 +850,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                         "Failed to count " + item.table + ":",
                         error
                     );
-
                     display.textContent = "Error";
                     continue;
                 }
@@ -627,10 +858,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     (count ?? 0).toLocaleString();
 
             } catch (error) {
-
                 console.error(error);
                 display.textContent = "Error";
-
             }
         }
     }
@@ -649,7 +878,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         attendance: "Attendance Management",
         payments: "Payments Management",
         digital: "Digital Services",
-        videohub: "VideoHub Management",
+        videohub: "MENYARWANDA Video Management",
         ai: "MENYA AI Management",
         reports: "Platform Reports"
     };
@@ -681,6 +910,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             top: 0,
             behavior: "smooth"
         });
+
+        if (page === "videohub") {
+            loadMenyarwandaVideos();
+        }
     }
 
     navButtons.forEach(button => {
@@ -707,14 +940,371 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
     logoutButton.addEventListener("click", async () => {
-
         logoutButton.disabled = true;
-
         await db.auth.signOut();
-
         window.location.replace("login.html");
-
     });
+
+    // ==========================================
+    // MENYARWANDA VIDEO MANAGEMENT
+    // ==========================================
+
+    const videoForm = document.getElementById("menyarwanda-video-form");
+    const videoTitle = document.getElementById("video-title");
+    const videoDescription = document.getElementById("video-description");
+    const videoUrl = document.getElementById("video-url");
+    const previewButton = document.getElementById("preview-video-btn");
+    const publishButton = document.getElementById("publish-video-btn");
+    const cancelEditButton = document.getElementById("cancel-edit-btn");
+    const previewContainer = document.getElementById("video-preview-container");
+    const previewFrame = document.getElementById("video-preview");
+    const videoMessage = document.getElementById("video-form-message");
+    const videoList = document.getElementById("menyarwanda-video-list");
+    const refreshVideosButton = document.getElementById("refresh-videos-btn");
+
+    let editingVideoId = null;
+
+    function getYouTubeId(value) {
+
+        try {
+            const url = new URL(value.trim());
+            const host = url.hostname.replace(/^www\./, "");
+
+            let id = "";
+
+            if (host === "youtu.be") {
+                id = url.pathname.split("/").filter(Boolean)[0] || "";
+            } else if (
+                host === "youtube.com" ||
+                host === "m.youtube.com" ||
+                host === "youtube-nocookie.com"
+            ) {
+                if (url.pathname === "/watch") {
+                    id = url.searchParams.get("v") || "";
+                } else {
+                    const parts = url.pathname.split("/").filter(Boolean);
+
+                    if (
+                        parts.length >= 2 &&
+                        ["embed", "shorts", "live"].includes(parts[0])
+                    ) {
+                        id = parts[1];
+                    }
+                }
+            }
+
+            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
+
+        } catch {
+            return null;
+        }
+    }
+
+    function showVideoMessage(text, isError = false) {
+        videoMessage.textContent = text;
+        videoMessage.style.color = isError ? "#ff7777" : "#91a0b5";
+    }
+
+    function resetVideoForm() {
+
+        videoForm.reset();
+
+        editingVideoId = null;
+
+        publishButton.textContent = "Publish Video";
+        cancelEditButton.style.display = "none";
+
+        previewContainer.style.display = "none";
+        previewFrame.src = "";
+
+        showVideoMessage("");
+    }
+
+    function previewVideo() {
+
+        const id = getYouTubeId(videoUrl.value);
+
+        if (!id) {
+            previewContainer.style.display = "none";
+            previewFrame.src = "";
+            showVideoMessage("Please enter a valid YouTube video URL.", true);
+            return;
+        }
+
+        previewFrame.src =
+            "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(id);
+
+        previewContainer.style.display = "block";
+
+        showVideoMessage("Video preview is ready.");
+    }
+
+    previewButton.addEventListener("click", previewVideo);
+
+    videoUrl.addEventListener("input", () => {
+        previewContainer.style.display = "none";
+        previewFrame.src = "";
+    });
+
+    async function loadMenyarwandaVideos() {
+
+        videoList.innerHTML =
+            '<p class="muted">Loading videos...</p>';
+
+        const { data, error } = await db
+            .from("menyarwanda_videos")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Video loading error:", error);
+            videoList.innerHTML =
+                '<p class="muted">Could not load videos: ' +
+                escapeHTML(error.message) + '</p>';
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            videoList.innerHTML =
+                '<p class="muted">No videos have been added yet.</p>';
+            return;
+        }
+
+        videoList.innerHTML = "";
+
+        data.forEach(video => {
+
+            const item = document.createElement("article");
+            item.className = "video-item";
+
+            const videoId = getYouTubeId(video.youtube_url);
+
+            const thumbnail = video.thumbnail_url ||
+                (videoId
+                    ? "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg"
+                    : "");
+
+            const image = document.createElement("img");
+            image.src = thumbnail;
+            image.alt = video.title;
+            image.loading = "lazy";
+
+            const content = document.createElement("div");
+            content.className = "video-item-content";
+
+            const heading = document.createElement("h4");
+            heading.textContent = video.title;
+
+            const description = document.createElement("p");
+            description.textContent = video.description || "No description";
+
+            const status = document.createElement("span");
+            status.className =
+                "video-status " +
+                (video.published ? "published" : "unpublished");
+
+            status.textContent =
+                video.published ? "Published" : "Unpublished";
+
+            const actions = document.createElement("div");
+            actions.className = "video-item-actions";
+
+            const editButton = document.createElement("button");
+            editButton.className = "video-action video-secondary";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => {
+                editVideo(video);
+            });
+
+            const toggleButton = document.createElement("button");
+            toggleButton.className =
+                "video-action " +
+                (video.published ? "video-secondary" : "video-success");
+
+            toggleButton.textContent =
+                video.published ? "Unpublish" : "Publish";
+
+            toggleButton.addEventListener("click", () => {
+                toggleVideoStatus(video);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "video-action video-danger";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", () => {
+                deleteVideo(video);
+            });
+
+            actions.append(editButton, toggleButton, deleteButton);
+
+            content.append(
+                heading,
+                description,
+                status,
+                document.createElement("br"),
+                actions
+            );
+
+            item.append(image, content);
+            videoList.appendChild(item);
+        });
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]);
+    }
+
+    videoForm.addEventListener("submit", async event => {
+
+        event.preventDefault();
+
+        const title = videoTitle.value.trim();
+        const description = videoDescription.value.trim();
+        const youtubeUrl = videoUrl.value.trim();
+
+        const youtubeId = getYouTubeId(youtubeUrl);
+
+        if (!title) {
+            showVideoMessage("Video title is required.", true);
+            return;
+        }
+
+        if (!youtubeId) {
+            showVideoMessage("Please enter a valid YouTube URL.", true);
+            return;
+        }
+
+        const thumbnailUrl =
+            "https://img.youtube.com/vi/" + youtubeId + "/hqdefault.jpg";
+
+        publishButton.disabled = true;
+        showVideoMessage(editingVideoId ? "Updating video..." : "Publishing video...");
+
+        try {
+
+            let result;
+
+            if (editingVideoId) {
+
+                result = await db
+                    .from("menyarwanda_videos")
+                    .update({
+                        title,
+                        description,
+                        youtube_url: youtubeUrl,
+                        thumbnail_url: thumbnailUrl
+                    })
+                    .eq("id", editingVideoId);
+
+            } else {
+
+                result = await db
+                    .from("menyarwanda_videos")
+                    .insert({
+                        title,
+                        description,
+                        youtube_url: youtubeUrl,
+                        thumbnail_url: thumbnailUrl,
+                        published: true
+                    });
+            }
+
+            if (result.error) {
+                throw result.error;
+            }
+
+            showVideoMessage(
+                editingVideoId
+                    ? "Video updated successfully."
+                    : "Video published successfully."
+            );
+
+            resetVideoForm();
+            await loadMenyarwandaVideos();
+
+        } catch (error) {
+
+            console.error("Video save error:", error);
+            showVideoMessage(error.message || "Failed to save video.", true);
+
+        } finally {
+            publishButton.disabled = false;
+        }
+    });
+
+    function editVideo(video) {
+
+        editingVideoId = video.id;
+
+        videoTitle.value = video.title || "";
+        videoDescription.value = video.description || "";
+        videoUrl.value = video.youtube_url || "";
+
+        publishButton.textContent = "Save Changes";
+        cancelEditButton.style.display = "inline-block";
+
+        previewContainer.style.display = "none";
+        previewFrame.src = "";
+
+        showVideoMessage("Editing video: " + video.title);
+
+        document.getElementById("page-videohub").scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+        });
+    }
+
+    async function toggleVideoStatus(video) {
+
+        const newStatus = !video.published;
+
+        const action = newStatus ? "publish" : "unpublish";
+
+        if (!confirm("Are you sure you want to " + action + " this video?")) {
+            return;
+        }
+
+        const { error } = await db
+            .from("menyarwanda_videos")
+            .update({ published: newStatus })
+            .eq("id", video.id);
+
+        if (error) {
+            alert("Could not update video: " + error.message);
+            return;
+        }
+
+        await loadMenyarwandaVideos();
+    }
+
+    async function deleteVideo(video) {
+
+        if (!confirm("Are you sure you want to permanently delete this video?")) {
+            return;
+        }
+
+        const { error } = await db
+            .from("menyarwanda_videos")
+            .delete()
+            .eq("id", video.id);
+
+        if (error) {
+            alert("Could not delete video: " + error.message);
+            return;
+        }
+
+        await loadMenyarwandaVideos();
+    }
+
+    cancelEditButton.addEventListener("click", resetVideoForm);
+
+    refreshVideosButton.addEventListener("click", loadMenyarwandaVideos);
 
 });
 </script>
