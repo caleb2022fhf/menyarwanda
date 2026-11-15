@@ -2,171 +2,671 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#080d18">
-    <title>MENYARWANDA - Admin Dashboard</title>
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080d18">
+<title>MENYARWANDA - Admin Dashboard</title>
+<link rel="stylesheet" href="css/style.css">
 
-        .admin-badge {
-            color: #00c8ff;
-            border: 1px solid #00c8ff;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-        }
+<style>
+* {
+    box-sizing: border-box;
+}
 
-        .admin-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 18px;
-            margin-top: 25px;
-        }
+body {
+    background: #080d18;
+    color: #fff;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
 
-        .admin-card {
-            background: #111b2d;
-            border: 1px solid #26364e;
-            border-radius: 12px;
-            padding: 22px;
-        }
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
 
-        .admin-card h3 {
-            color: #00c8ff;
-            margin-bottom: 12px;
-        }
+.sidebar {
+    width: 255px;
+    background: #0d1728;
+    border-right: 1px solid #26364e;
+    padding: 24px 15px;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    z-index: 100;
+}
 
-        .logout-btn {
-            background: #e63946;
-            color: white;
-            border: none;
-            padding: 11px 18px;
-            border-radius: 7px;
-            cursor: pointer;
-        }
-    </style>
+.brand {
+    color: #00c8ff;
+    font-size: 22px;
+    font-weight: bold;
+    padding: 10px;
+    margin-bottom: 30px;
+}
+
+.sidebar-label {
+    color: #718096;
+    font-size: 11px;
+    padding: 12px;
+    letter-spacing: 1px;
+}
+
+.nav-button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 13px 14px;
+    margin: 5px 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #aab7c8;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.nav-button:hover,
+.nav-button.active {
+    background: #123047;
+    color: #00c8ff;
+}
+
+.nav-button span {
+    width: 30px;
+    font-size: 17px;
+}
+
+.main-area {
+    width: calc(100% - 255px);
+    margin-left: 255px;
+}
+
+.topbar {
+    min-height: 75px;
+    padding: 15px 30px;
+    background: #0d1728;
+    border-bottom: 1px solid #26364e;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.topbar h2 {
+    font-size: 19px;
+}
+
+.admin-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.admin-status {
+    color: #00c8ff;
+    font-size: 12px;
+    border: 1px solid #00c8ff;
+    padding: 7px 12px;
+    border-radius: 20px;
+}
+
+.logout-btn {
+    background: #e63946;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 7px;
+    color: white;
+    cursor: pointer;
+}
+
+.content {
+    padding: 30px;
+}
+
+.page-section {
+    display: none;
+}
+
+.page-section.active {
+    display: block;
+}
+
+.page-heading {
+    margin-bottom: 25px;
+}
+
+.page-heading h1 {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.muted {
+    color: #91a0b5;
+    line-height: 1.6;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 18px;
+    margin: 25px 0;
+}
+
+.stat-card {
+    background: #111b2d;
+    border: 1px solid #26364e;
+    padding: 22px;
+    border-radius: 12px;
+}
+
+.stat-card p {
+    color: #91a0b5;
+    font-size: 13px;
+}
+
+.stat-card h2 {
+    color: #00c8ff;
+    font-size: 28px;
+    margin: 12px 0 0;
+}
+
+.section-title {
+    margin: 30px 0 18px;
+    font-size: 19px;
+}
+
+.module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.module-card {
+    background: #111b2d;
+    border: 1px solid #26364e;
+    padding: 22px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.module-card:hover {
+    border-color: #00c8ff;
+    transform: translateY(-3px);
+}
+
+.module-icon {
+    font-size: 27px;
+    margin-bottom: 15px;
+}
+
+.module-card h3 {
+    color: #00c8ff;
+    margin-bottom: 10px;
+}
+
+.module-card p {
+    color: #91a0b5;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.back-button {
+    background: #19263a;
+    color: white;
+    border: 1px solid #34445d;
+    border-radius: 7px;
+    padding: 9px 14px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.panel-placeholder {
+    background: #111b2d;
+    border: 1px solid #26364e;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 20px;
+}
+
+.panel-placeholder h3 {
+    color: #00c8ff;
+    margin-bottom: 12px;
+}
+
+.mobile-menu {
+    display: none;
+    background: #19263a;
+    border: 1px solid #34445d;
+    color: white;
+    padding: 9px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+}
+
+#admin-message {
+    margin-bottom: 15px;
+}
+
+@media(max-width: 850px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: .25s;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-area {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .content {
+        padding: 20px 15px;
+    }
+
+    .topbar {
+        padding: 14px 15px;
+    }
+}
+</style>
 </head>
+
 <body>
 
-    <header class="main-header admin-header">
-        <a href="admin.html" class="logo">MENYARWANDA</a>
-        <span class="admin-badge">ADMIN PANEL</span>
-        <button id="logout-button" class="logout-btn">Logout</button>
-    </header>
+<div class="admin-layout">
 
-    <main class="container" style="padding-top:35px;">
+    <aside class="sidebar" id="sidebar">
 
-        <h1>Admin Dashboard</h1>
+        <div class="brand">MENYARWANDA</div>
 
-        <p class="muted" style="margin-top:10px;">
-            Welcome, <strong id="admin-name">Administrator</strong>
-        </p>
+        <div class="sidebar-label">MAIN MENU</div>
 
-        <p id="admin-message" class="muted" style="margin-top:15px;">
-            Checking administrator access...
-        </p>
+        <button class="nav-button active" data-page="overview">
+            <span>▦</span> Overview
+        </button>
 
-        <section class="admin-grid">
+        <button class="nav-button" data-page="users">
+            <span>♙</span> Users Management
+        </button>
 
-            <div class="admin-card">
-                <h3>Users Management</h3>
-                <p class="muted">Manage registered users and students.</p>
+        <button class="nav-button" data-page="courses">
+            <span>▤</span> Courses
+        </button>
+
+        <button class="nav-button" data-page="attendance">
+            <span>◷</span> Attendance
+        </button>
+
+        <button class="nav-button" data-page="payments">
+            <span>▣</span> Payments
+        </button>
+
+        <div class="sidebar-label">PLATFORM SERVICES</div>
+
+        <button class="nav-button" data-page="digital">
+            <span>◇</span> Digital Services
+        </button>
+
+        <button class="nav-button" data-page="videohub">
+            <span>▷</span> VideoHub
+        </button>
+
+        <button class="nav-button" data-page="ai">
+            <span>✧</span> MENYA AI
+        </button>
+
+        <div class="sidebar-label">ANALYTICS</div>
+
+        <button class="nav-button" data-page="reports">
+            <span>▥</span> Reports
+        </button>
+
+    </aside>
+
+    <div class="main-area">
+
+        <header class="topbar">
+
+            <div style="display:flex;align-items:center;gap:14px;">
+                <button class="mobile-menu" id="mobile-menu">☰</button>
+                <h2 id="current-page-title">Dashboard Overview</h2>
             </div>
 
-            <div class="admin-card">
-                <h3>Courses</h3>
-                <p class="muted">Manage learning courses.</p>
+            <div class="admin-info">
+                <span class="admin-status">ADMIN</span>
+                <strong id="admin-name">Administrator</strong>
+                <button id="logout-button" class="logout-btn">
+                    Logout
+                </button>
             </div>
 
-            <div class="admin-card">
-                <h3>Attendance</h3>
-                <p class="muted">Monitor student attendance.</p>
-            </div>
+        </header>
 
-            <div class="admin-card">
-                <h3>Payments</h3>
-                <p class="muted">Monitor student payments.</p>
-            </div>
+        <main class="content">
 
-            <div class="admin-card">
-                <h3>Digital Services</h3>
-                <p class="muted">Manage digital services.</p>
-            </div>
+            <p id="admin-message" class="muted">
+                Checking administrator access...
+            </p>
 
-            <div class="admin-card">
-                <h3>VideoHub</h3>
-                <p class="muted">Manage educational video links.</p>
-            </div>
+            <section class="page-section active" id="page-overview">
 
-            <div class="admin-card">
-                <h3>MENYA AI</h3>
-                <p class="muted">Manage AI assistant settings.</p>
-            </div>
+                <div class="page-heading">
+                    <h1>Dashboard Overview</h1>
+                    <p class="muted">
+                        Welcome back,
+                        <strong id="welcome-name">Administrator</strong>.
+                        Manage your MENYARWANDA platform.
+                    </p>
+                </div>
 
-            <div class="admin-card">
-                <h3>Reports</h3>
-                <p class="muted">View platform reports.</p>
-            </div>
+                <div class="stats-grid">
 
-        </section>
-    </main>
+                    <div class="stat-card">
+                        <p>Total Users</p>
+                        <h2>—</h2>
+                    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
+                    <div class="stat-card">
+                        <p>Total Courses</p>
+                        <h2>—</h2>
+                    </div>
 
-    <script>
-        "use strict";
+                    <div class="stat-card">
+                        <p>Attendance Records</p>
+                        <h2>—</h2>
+                    </div>
 
-        document.addEventListener("DOMContentLoaded", async () => {
-            const db = window.MENYARWANDA_DB;
-            const message = document.getElementById("admin-message");
+                    <div class="stat-card">
+                        <p>Total Payments</p>
+                        <h2>—</h2>
+                    </div>
 
-            if (!db) {
-                message.textContent = "Database connection unavailable.";
-                return;
-            }
+                </div>
 
-            const { data: sessionData, error: sessionError } =
-                await db.auth.getSession();
+                <h2 class="section-title">Platform Management</h2>
 
-            if (sessionError || !sessionData.session) {
-                window.location.replace("login.html");
-                return;
-            }
+                <div class="module-grid">
 
-            const user = sessionData.session.user;
+                    <div class="module-card" data-open="users">
+                        <div class="module-icon">♙</div>
+                        <h3>Users Management</h3>
+                        <p>View and manage registered users and students.</p>
+                    </div>
 
-            const { data: profile, error } = await db
-                .from("profiles")
-                .select("full_name, role")
-                .eq("id", user.id)
-                .single();
+                    <div class="module-card" data-open="courses">
+                        <div class="module-icon">▤</div>
+                        <h3>Courses</h3>
+                        <p>Create, edit and manage learning courses.</p>
+                    </div>
 
-            if (error || !profile || profile.role !== "admin") {
-                await db.auth.signOut();
-                window.location.replace("login.html");
-                return;
-            }
+                    <div class="module-card" data-open="attendance">
+                        <div class="module-icon">◷</div>
+                        <h3>Attendance</h3>
+                        <p>Monitor student attendance records.</p>
+                    </div>
 
-            document.getElementById("admin-name").textContent =
-                profile.full_name || "Administrator";
+                    <div class="module-card" data-open="payments">
+                        <div class="module-icon">▣</div>
+                        <h3>Payments</h3>
+                        <p>Monitor payments and transaction records.</p>
+                    </div>
 
-            message.textContent = "Administrator access verified.";
+                    <div class="module-card" data-open="digital">
+                        <div class="module-icon">◇</div>
+                        <h3>Digital Services</h3>
+                        <p>Manage services, orders and customers.</p>
+                    </div>
 
-            document.getElementById("logout-button")
-                .addEventListener("click", async () => {
-                    await db.auth.signOut();
-                    window.location.replace("login.html");
-                });
+                    <div class="module-card" data-open="videohub">
+                        <div class="module-icon">▷</div>
+                        <h3>VideoHub</h3>
+                        <p>Add, edit, publish and manage YouTube videos.</p>
+                    </div>
+
+                    <div class="module-card" data-open="ai">
+                        <div class="module-icon">✧</div>
+                        <h3>MENYA AI</h3>
+                        <p>Manage the AI assistant and its settings.</p>
+                    </div>
+
+                    <div class="module-card" data-open="reports">
+                        <div class="module-icon">▥</div>
+                        <h3>Reports</h3>
+                        <p>View platform statistics and reports.</p>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="page-section" id="page-users">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Users Management</h1>
+                    <p class="muted">Manage registered users and students.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Registered Users</h3>
+                    <p class="muted">User management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-courses">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Courses Management</h1>
+                    <p class="muted">Manage learning courses.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Courses</h3>
+                    <p class="muted">Course management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-attendance">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Attendance Management</h1>
+                    <p class="muted">Monitor student attendance.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Attendance Records</h3>
+                    <p class="muted">Attendance management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-payments">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Payments Management</h1>
+                    <p class="muted">Monitor student payments.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Payment Records</h3>
+                    <p class="muted">Payment management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-digital">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Digital Services Management</h1>
+                    <p class="muted">Manage digital services and customer orders.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Digital Services</h3>
+                    <p class="muted">Service management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-videohub">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>VideoHub Management</h1>
+                    <p class="muted">Manage educational YouTube videos.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>VideoHub</h3>
+                    <p class="muted">Video management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-ai">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>MENYA AI Management</h1>
+                    <p class="muted">Manage the AI assistant.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>AI Assistant</h3>
+                    <p class="muted">AI management tools will be added here.</p>
+                </div>
+            </section>
+
+            <section class="page-section" id="page-reports">
+                <button class="back-button" data-back>← Overview</button>
+                <div class="page-heading">
+                    <h1>Platform Reports</h1>
+                    <p class="muted">Review platform activity and statistics.</p>
+                </div>
+                <div class="panel-placeholder">
+                    <h3>Reports</h3>
+                    <p class="muted">Reporting tools will be added here.</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+
+<script>
+"use strict";
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    const db = window.MENYARWANDA_DB;
+    const message = document.getElementById("admin-message");
+    const logoutButton = document.getElementById("logout-button");
+
+    if (!db) {
+        message.textContent = "Database connection unavailable.";
+        return;
+    }
+
+    const { data: sessionData, error: sessionError } =
+        await db.auth.getSession();
+
+    if (sessionError || !sessionData.session) {
+        window.location.replace("login.html");
+        return;
+    }
+
+    const user = sessionData.session.user;
+
+    const { data: profile, error } = await db
+        .from("profiles")
+        .select("full_name, role")
+        .eq("id", user.id)
+        .single();
+
+    if (error || !profile || profile.role !== "admin") {
+        await db.auth.signOut();
+        window.location.replace("login.html");
+        return;
+    }
+
+    const adminName = profile.full_name || "Administrator";
+
+    document.getElementById("admin-name").textContent = adminName;
+    document.getElementById("welcome-name").textContent = adminName;
+
+    message.textContent = "Administrator access verified.";
+
+    const sections = document.querySelectorAll(".page-section");
+    const navButtons = document.querySelectorAll(".nav-button");
+    const title = document.getElementById("current-page-title");
+    const sidebar = document.getElementById("sidebar");
+
+    const pageTitles = {
+        overview: "Dashboard Overview",
+        users: "Users Management",
+        courses: "Courses Management",
+        attendance: "Attendance Management",
+        payments: "Payments Management",
+        digital: "Digital Services",
+        videohub: "VideoHub Management",
+        ai: "MENYA AI Management",
+        reports: "Platform Reports"
+    };
+
+    function openPage(page) {
+        sections.forEach(section => {
+            section.classList.remove("active");
         });
-    </script>
+
+        const selected = document.getElementById("page-" + page);
+
+        if (!selected) return;
+
+        selected.classList.add("active");
+
+        navButtons.forEach(button => {
+            button.classList.toggle(
+                "active",
+                button.dataset.page === page
+            );
+        });
+
+        title.textContent = pageTitles[page] || "Dashboard";
+        sidebar.classList.remove("open");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    navButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            openPage(button.dataset.page);
+        });
+    });
+
+    document.querySelectorAll("[data-open]").forEach(card => {
+        card.addEventListener("click", () => {
+            openPage(card.dataset.open);
+        });
+    });
+
+    document.querySelectorAll("[data-back]").forEach(button => {
+        button.addEventListener("click", () => {
+            openPage("overview");
+        });
+    });
+
+    document.getElementById("mobile-menu")
+        .addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+        });
+
+    logoutButton.addEventListener("click", async () => {
+        logoutButton.disabled = true;
+        await db.auth.signOut();
+        window.location.replace("login.html");
+    });
+
+});
+</script>
 
 </body>
 </html>
