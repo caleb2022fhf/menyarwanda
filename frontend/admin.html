@@ -174,11 +174,6 @@ body {
     margin: 12px 0 0;
 }
 
-.section-title {
-    margin: 30px 0 18px;
-    font-size: 19px;
-}
-
 .module-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -374,22 +369,22 @@ body {
 
                     <div class="stat-card">
                         <p>Total Users</p>
-                        <h2>—</h2>
+                        <h2 id="total-users">Loading...</h2>
                     </div>
 
                     <div class="stat-card">
                         <p>Total Courses</p>
-                        <h2>—</h2>
+                        <h2 id="total-courses">Loading...</h2>
                     </div>
 
                     <div class="stat-card">
                         <p>Attendance Records</p>
-                        <h2>—</h2>
+                        <h2 id="total-attendance">Loading...</h2>
                     </div>
 
                     <div class="stat-card">
                         <p>Total Payments</p>
-                        <h2>—</h2>
+                        <h2 id="total-payments">Loading...</h2>
                     </div>
 
                 </div>
@@ -596,6 +591,52 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     message.textContent = "Administrator access verified.";
 
+    async function loadDashboardStatistics() {
+
+        const statistics = [
+            { table: "profiles", element: "total-users" },
+            { table: "courses", element: "total-courses" },
+            { table: "attendance", element: "total-attendance" },
+            { table: "payments", element: "total-payments" }
+        ];
+
+        for (const item of statistics) {
+
+            const display = document.getElementById(item.element);
+
+            try {
+
+                const { count, error } = await db
+                    .from(item.table)
+                    .select("*", {
+                        count: "exact",
+                        head: true
+                    });
+
+                if (error) {
+                    console.error(
+                        "Failed to count " + item.table + ":",
+                        error
+                    );
+
+                    display.textContent = "Error";
+                    continue;
+                }
+
+                display.textContent =
+                    (count ?? 0).toLocaleString();
+
+            } catch (error) {
+
+                console.error(error);
+                display.textContent = "Error";
+
+            }
+        }
+    }
+
+    await loadDashboardStatistics();
+
     const sections = document.querySelectorAll(".page-section");
     const navButtons = document.querySelectorAll(".nav-button");
     const title = document.getElementById("current-page-title");
@@ -614,6 +655,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     function openPage(page) {
+
         sections.forEach(section => {
             section.classList.remove("active");
         });
@@ -632,8 +674,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
         title.textContent = pageTitles[page] || "Dashboard";
+
         sidebar.classList.remove("open");
-        window.scrollTo({ top: 0, behavior: "smooth" });
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
     }
 
     navButtons.forEach(button => {
@@ -660,9 +707,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
     logoutButton.addEventListener("click", async () => {
+
         logoutButton.disabled = true;
+
         await db.auth.signOut();
+
         window.location.replace("login.html");
+
     });
 
 });
