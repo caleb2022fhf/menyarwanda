@@ -19,48 +19,30 @@ const MENYARWANDA = {
 
 window.MENYARWANDA = MENYARWANDA;
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
     document.documentElement.dataset.platform = "menyarwanda";
 
     const status = document.getElementById("connection-status");
 
-    console.log("MENYARWANDA platform initialized.");
-
-    if (!window.MENYARWANDA_DB) {
-        if (status) {
-            status.textContent = "Database connection failed.";
-            status.style.color = "#ff5555";
-        }
-
-        console.error("Supabase client is not available.");
-        return;
-    }
-
-    try {
-        const { error } = await window.MENYARWANDA_DB
-            .from("connection_test")
-            .select("*")
-            .limit(1);
-
-        if (error && error.code !== "42P01") {
-            throw error;
-        }
+    if (window.MENYARWANDA_DB) {
 
         if (status) {
-            status.textContent = "Supabase client connected successfully.";
+            status.textContent = "MENYARWANDA database client initialized.";
             status.style.color = "#00c8ff";
         }
 
-        console.log("Supabase client initialized successfully.");
+        console.log("MENYARWANDA Supabase client initialized.");
 
-    } catch (error) {
+    } else {
+
         if (status) {
-            status.textContent = "Database test needs configuration.";
-            status.style.color = "#ffb347";
+            status.textContent = "Database client unavailable.";
+            status.style.color = "#ff5555";
         }
 
-        console.error("Supabase test:", error.message);
+        console.error("MENYARWANDA Supabase client is unavailable.");
+
     }
 
 });
