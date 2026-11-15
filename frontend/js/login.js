@@ -2,86 +2,65 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
+    const loginForm = document.getElementById("login-form");
+    const loginButton = document.getElementById("login-button");
+    const loginMessage = document.getElementById("login-message");
 
-    const form = document.getElementById("login-form");
-    const button = document.getElementById("login-button");
-    const message = document.getElementById("login-message");
-
-    const emailInput = document.getElementById("email");
-    const pinInput = document.getElementById("pin");
-
-    function showMessage(text, color) {
-        message.textContent = text;
-        message.style.color = color;
-    }
-
-    form.addEventListener("submit", async (event) => {
-
+    loginForm.addEventListener("submit", async (event) => {
         event.preventDefault();
 
-        if (!window.MENYARWANDA_DB) {
-            showMessage(
-                "Database connection is unavailable.",
-                "#ff5555"
-            );
+        const email = document.getElementById("email").value.trim();
+        const pin = document.getElementById("pin").value;
+
+        const db = window.MENYARWANDA_DB;
+
+        if (!db) {
+            loginMessage.textContent = "Database connection unavailable.";
             return;
         }
 
-        const email = emailInput.value.trim().toLowerCase();
-        const pin = pinInput.value;
-
-        if (!email || !pin) {
-            showMessage(
-                "Please enter your email and PIN.",
-                "#ff5555"
-            );
-            return;
-        }
-
-        button.disabled = true;
-        button.textContent = "Logging in...";
-
-        showMessage("Checking your account...", "#00c8ff");
+        loginButton.disabled = true;
+        loginButton.textContent = "Logging in...";
+        loginMessage.textContent = "";
 
         try {
-
-            const { data, error } =
-                await window.MENYARWANDA_DB.auth.signInWithPassword({
-                    email: email,
-                    password: pin
-                });
+            const { data, error } = await db.auth.signInWithPassword({
+                email,
+                password: pin
+            });
 
             if (error) {
                 throw error;
             }
 
-            if (!data.session || !data.user) {
-                throw new Error("Login session could not be created.");
+            const { data: profile, error: profileError } = await db
+                .from("profiles")
+                .select("role")
+                .eq("id", data.user.id)
+                .single();
+
+            if (profileError || !profile) {
+                await db.auth.signOut();
+                throw new Error("Unable to verify your account role.");
             }
 
-            showMessage(
-                "Login successful! Opening your dashboard...",
-                "#00c8ff"
-            );
-
-            window.location.href = "dashboard.html";
+            if (profile.role === "admin") {
+                window.location.replace("admin.html");
+            } else if (profile.role === "student") {
+                window.location.replace("dashboard.html");
+            } else {
+                await db.auth.signOut();
+                throw new Error("Your account role is not recognized.");
+            }
 
         } catch (error) {
+            loginMessage.textContent =
+                error.message === "Invalid login credentials"
+                    ? "Incorrect email or PIN."
+                    : error.message || "Login failed. Please try again.";
 
-            console.error("Login error:", error);
-
-            showMessage(
-                "Invalid email or PIN. Please try again.",
-                "#ff5555"
-            );
-
-        } finally {
-
-            button.disabled = false;
-            button.textContent = "Login";
-
+            loginButton.disabled = false;
+            loginButton.textContent = "Login";
         }
-
     });
-
 });
