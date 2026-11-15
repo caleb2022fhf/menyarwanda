@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080d18">
+    <title>MENYARWANDA - Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .admin-badge {
+            color: #00c8ff;
+            border: 1px solid #00c8ff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .admin-card {
+            background: #111b2d;
+            border: 1px solid #26364e;
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .admin-card h3 {
+            color: #00c8ff;
+            margin-bottom: 12px;
+        }
+
+        .logout-btn {
+            background: #e63946;
+            color: white;
+            border: none;
+            padding: 11px 18px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header admin-header">
+        <a href="admin.html" class="logo">MENYARWANDA</a>
+        <span class="admin-badge">ADMIN PANEL</span>
+        <button id="logout-button" class="logout-btn">Logout</button>
+    </header>
+
+    <main class="container" style="padding-top:35px;">
+
+        <h1>Admin Dashboard</h1>
+
+        <p class="muted" style="margin-top:10px;">
+            Welcome, <strong id="admin-name">Administrator</strong>
+        </p>
+
+        <p id="admin-message" class="muted" style="margin-top:15px;">
+            Checking administrator access...
+        </p>
+
+        <section class="admin-grid">
+
+            <div class="admin-card">
+                <h3>Users Management</h3>
+                <p class="muted">Manage registered users and students.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>Courses</h3>
+                <p class="muted">Manage learning courses.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>Attendance</h3>
+                <p class="muted">Monitor student attendance.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>Payments</h3>
+                <p class="muted">Monitor student payments.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>Digital Services</h3>
+                <p class="muted">Manage digital services.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>VideoHub</h3>
+                <p class="muted">Manage educational video links.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>MENYA AI</h3>
+                <p class="muted">Manage AI assistant settings.</p>
+            </div>
+
+            <div class="admin-card">
+                <h3>Reports</h3>
+                <p class="muted">View platform reports.</p>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+
+    <script>
+        "use strict";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const db = window.MENYARWANDA_DB;
+            const message = document.getElementById("admin-message");
+
+            if (!db) {
+                message.textContent = "Database connection unavailable.";
+                return;
+            }
+
+            const { data: sessionData, error: sessionError } =
+                await db.auth.getSession();
+
+            if (sessionError || !sessionData.session) {
+                window.location.replace("login.html");
+                return;
+            }
+
+            const user = sessionData.session.user;
+
+            const { data: profile, error } = await db
+                .from("profiles")
+                .select("full_name, role")
+                .eq("id", user.id)
+                .single();
+
+            if (error || !profile || profile.role !== "admin") {
+                await db.auth.signOut();
+                window.location.replace("login.html");
+                return;
+            }
+
+            document.getElementById("admin-name").textContent =
+                profile.full_name || "Administrator";
+
+            message.textContent = "Administrator access verified.";
+
+            document.getElementById("logout-button")
+                .addEventListener("click", async () => {
+                    await db.auth.signOut();
+                    window.location.replace("login.html");
+                });
+        });
+    </script>
+
+</body>
+</html>
