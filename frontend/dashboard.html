@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#080d18">
+
+    <title>Student Dashboard - MENYARWANDA</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <header class="main-header">
+        <a href="dashboard.html" class="logo">MENYARWANDA</a>
+
+        <div>
+            <span id="student-name" class="muted">
+                Loading profile...
+            </span>
+
+            <button
+                type="button"
+                id="logout-button"
+                class="primary-btn"
+                style="margin-left:12px;"
+            >
+                Logout
+            </button>
+        </div>
+    </header>
+
+    <main class="container" style="padding-top:35px;">
+
+        <section class="card">
+            <h1>Welcome, <span id="welcome-name">Student</span>!</h1>
+
+            <p class="muted" style="margin-top:12px;">
+                Welcome to your MENYARWANDA learning dashboard.
+            </p>
+        </section>
+
+        <h2 style="margin:30px 0 18px;">My Learning</h2>
+
+        <div class="card">
+            <h3>My Courses</h3>
+
+            <p class="muted" style="margin-top:12px;">
+                Your enrolled courses will appear here.
+            </p>
+
+            <div id="courses-list" style="margin-top:18px;">
+                Loading courses...
+            </div>
+        </div>
+
+        <h2 style="margin:30px 0 18px;">MENYARWANDA Services</h2>
+
+        <div class="grid">
+
+            <div class="card">
+                <h3>Learning</h3>
+                <p class="muted">Access your learning materials.</p>
+            </div>
+
+            <div class="card">
+                <h3>Attendance</h3>
+                <p class="muted">View your course attendance.</p>
+            </div>
+
+            <div class="card">
+                <h3>MENYA AI</h3>
+                <p class="muted">Ask questions and learn with AI.</p>
+            </div>
+
+            <div class="card">
+                <h3>VideoHub</h3>
+                <p class="muted">Watch educational videos.</p>
+            </div>
+
+            <div class="card">
+                <h3>Digital Services</h3>
+                <p class="muted">Explore available digital services.</p>
+            </div>
+
+            <div class="card">
+                <h3>Payments</h3>
+                <p class="muted">View your payment information.</p>
+            </div>
+
+        </div>
+
+        <p
+            id="dashboard-message"
+            role="status"
+            aria-live="polite"
+            style="margin:25px 0;text-align:center;"
+        ></p>
+
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+    <script src="js/dashboard.js"></script>
+
+</body>
+</html>
