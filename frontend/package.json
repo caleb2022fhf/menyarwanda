@@ -1,0 +1,12 @@
+
+{
+  "name": "menyarwanda-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@google/genai": "^2.22.0"
+  }
+}
