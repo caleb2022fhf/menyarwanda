@@ -19,8 +19,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const aiLanguage = document.getElementById("ai-language");
     const aiStatus = document.getElementById("ai-status");
 
-    let conversationHistory = [];
-
     function showMessage(text, color = "#ff5555") {
         message.textContent = text;
         message.style.color = color;
@@ -43,8 +41,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const url = new URL(value);
             let videoId = "";
 
-            if (url.hostname === "youtu.be" ||
-                url.hostname === "www.youtu.be") {
+            if (
+                url.hostname === "youtu.be" ||
+                url.hostname === "www.youtu.be"
+            ) {
                 videoId = url.pathname.split("/").filter(Boolean)[0] || "";
             } else if (
                 url.hostname === "youtube.com" ||
@@ -233,16 +233,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             );
         }
 
-        const language = aiLanguage.value;
-
-        const history = conversationHistory.slice(-12);
-
         const response = await window.MenyaApp.request("/chat", {
             method: "POST",
             body: JSON.stringify({
                 question: question,
-                language: language,
-                history: history
+                language: aiLanguage.value
             })
         });
 
@@ -271,11 +266,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         addAIMessage(question, "user");
 
-        conversationHistory.push({
-            role: "user",
-            text: question
-        });
-
         aiQuestion.value = "";
         aiSendButton.disabled = true;
         aiSendButton.textContent = "Thinking...";
@@ -286,13 +276,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             const answer = await sendAIQuestion(question);
 
             addAIMessage(answer, "assistant");
-
-            conversationHistory.push({
-                role: "model",
-                text: answer
-            });
-
-            conversationHistory = conversationHistory.slice(-12);
 
             aiStatus.textContent = "MENYA AI is ready.";
 
