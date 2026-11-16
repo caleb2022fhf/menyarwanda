@@ -18,6 +18,7 @@ module.exports = async function handler(req, res) {
     }
 
     try {
+
         // Check Supabase login token
         const authorization = req.headers.authorization || "";
 
@@ -125,11 +126,15 @@ question is independent.
 `;
 
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+
+            model: "gemini-3.8-flash",
+
             contents: question.trim(),
+
             config: {
                 systemInstruction: systemInstruction
             }
+
         });
 
         const answer = response.text;
