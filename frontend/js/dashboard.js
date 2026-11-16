@@ -8,14 +8,316 @@ document.addEventListener("DOMContentLoaded", async () => {
     const studentName = document.getElementById("student-name");
     const welcomeName = document.getElementById("welcome-name");
     const coursesList = document.getElementById("courses-list");
+    const videosList = document.getElementById("videos-list");
     const message = document.getElementById("dashboard-message");
     const logoutButton = document.getElementById("logout-button");
+
+    const aiForm = document.getElementById("ai-form");
+    const aiQuestion = document.getElementById("ai-question");
+    const aiMessages = document.getElementById("ai-messages");
+    const aiSendButton = document.getElementById("ai-send-button");
+    const aiLanguage = document.getElementById("ai-language");
+    const aiStatus = document.getElementById("ai-status");
+
+    let conversationHistory = [];
 
     function showMessage(text, color = "#ff5555") {
         message.textContent = text;
         message.style.color = color;
     }
 
+    function addAIMessage(text, sender = "assistant") {
+        const bubble = document.createElement("div");
+
+        bubble.className = `ai-message ${sender}`;
+        bubble.textContent = text;
+
+        aiMessages.appendChild(bubble);
+        aiMessages.scrollTop = aiMessages.scrollHeight;
+
+        return bubble;
+    }
+
+    function getYouTubeId(value) {
+        try {
+            const url = new URL(value);
+            let videoId = "";
+
+            if (url.hostname === "youtu.be" ||
+                url.hostname === "www.youtu.be") {
+                videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+            } else if (
+                url.hostname === "youtube.com" ||
+                url.hostname === "www.youtube.com" ||
+                url.hostname === "m.youtube.com" ||
+                url.hostname === "music.youtube.com"
+            ) {
+                if (url.pathname === "/watch") {
+                    videoId = url.searchParams.get("v") || "";
+                } else {
+                    const parts = url.pathname.split("/").filter(Boolean);
+
+                    if (
+                        ["embed", "shorts", "live"].includes(parts[0])
+                    ) {
+                        videoId = parts[1] || "";
+                    }
+                }
+            }
+
+            return /^[a-zA-Z0-9_-]{11}$/.test(videoId)
+                ? videoId
+                : null;
+
+        } catch (error) {
+            return null;
+        }
+    }
+
+    async function loadCourses(userId) {
+
+        const { data: enrollments, error } = await db
+            .from("enrollments")
+            .select(`
+                course_id,
+                courses (
+                    id,
+                    title,
+                    description
+                )
+            `)
+            .eq("student_id", userId);
+
+        if (error) {
+            throw error;
+        }
+
+        coursesList.innerHTML = "";
+
+        if (!enrollments || enrollments.length === 0) {
+            coursesList.textContent =
+                "You have not enrolled in any courses yet.";
+            return;
+        }
+
+        enrollments.forEach((enrollment) => {
+
+            const course = enrollment.courses;
+
+            if (!course) return;
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.style.marginTop = "12px";
+
+            const title = document.createElement("h3");
+            title.textContent = course.title;
+
+            const description = document.createElement("p");
+            description.className = "muted";
+            description.style.marginTop = "8px";
+            description.textContent =
+                course.description || "No course description available.";
+
+            card.appendChild(title);
+            card.appendChild(description);
+
+            coursesList.appendChild(card);
+
+        });
+    }
+
+    async function loadVideos() {
+
+        videosList.innerHTML = `
+            <div class="card empty-state">
+                Loading learning videos...
+            </div>
+        `;
+
+        const { data: videos, error } = await db
+            .from("menyarwanda_videos")
+            .select(`
+                id,
+                title,
+                description,
+                youtube_url,
+                thumbnail_url,
+                created_at
+            `)
+            .eq("published", true)
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            console.error("Videos loading error:", error);
+
+            videosList.innerHTML = `
+                <div class="card empty-state">
+                    Unable to load learning videos. Please refresh the page.
+                </div>
+            `;
+            return;
+        }
+
+        videosList.innerHTML = "";
+
+        if (!videos || videos.length === 0) {
+            videosList.innerHTML = `
+                <div class="card empty-state">
+                    No learning videos are available yet.
+                </div>
+            `;
+            return;
+        }
+
+        videos.forEach((video) => {
+
+            const videoId = getYouTubeId(video.youtube_url);
+
+            const card = document.createElement("article");
+            card.className = "card video-card";
+
+            if (videoId) {
+
+                const iframe = document.createElement("iframe");
+
+                iframe.className = "video-frame";
+                iframe.src =
+                    `https://www.youtube-nocookie.com/embed/${videoId}`;
+
+                iframe.title = video.title || "Learning video";
+                iframe.allow =
+                    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+
+                iframe.allowFullscreen = true;
+                iframe.loading = "lazy";
+
+                card.appendChild(iframe);
+
+            } else {
+
+                const invalid = document.createElement("div");
+                invalid.className = "empty-state";
+                invalid.textContent = "This video link is invalid.";
+
+                card.appendChild(invalid);
+            }
+
+            const details = document.createElement("div");
+            details.className = "video-details";
+
+            const title = document.createElement("h3");
+            title.textContent = video.title || "Untitled video";
+
+            const description = document.createElement("p");
+            description.className = "muted video-description";
+            description.textContent =
+                video.description || "No description available.";
+
+            details.appendChild(title);
+            details.appendChild(description);
+
+            card.appendChild(details);
+            videosList.appendChild(card);
+
+        });
+    }
+
+    async function sendAIQuestion(question) {
+
+        if (!window.MenyaApp ||
+            typeof window.MenyaApp.request !== "function") {
+
+            throw new Error(
+                "MENYA AI connection is not available. Check js/app.js."
+            );
+        }
+
+        const language = aiLanguage.value;
+
+        const history = conversationHistory.slice(-12);
+
+        const response = await window.MenyaApp.request("/chat", {
+            method: "POST",
+            body: JSON.stringify({
+                question: question,
+                language: language,
+                history: history
+            })
+        });
+
+        if (!response || !response.answer) {
+            throw new Error("MENYA AI did not return an answer.");
+        }
+
+        return response.answer;
+    }
+
+    aiForm.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const question = aiQuestion.value.trim();
+
+        if (!question) {
+            return;
+        }
+
+        if (question.length > 5000) {
+            aiStatus.textContent =
+                "Your question is too long. Please shorten it.";
+            return;
+        }
+
+        addAIMessage(question, "user");
+
+        conversationHistory.push({
+            role: "user",
+            text: question
+        });
+
+        aiQuestion.value = "";
+        aiSendButton.disabled = true;
+        aiSendButton.textContent = "Thinking...";
+        aiStatus.textContent = "MENYA AI is preparing your answer...";
+
+        try {
+
+            const answer = await sendAIQuestion(question);
+
+            addAIMessage(answer, "assistant");
+
+            conversationHistory.push({
+                role: "model",
+                text: answer
+            });
+
+            conversationHistory = conversationHistory.slice(-12);
+
+            aiStatus.textContent = "MENYA AI is ready.";
+
+        } catch (error) {
+
+            console.error("MENYA AI error:", error);
+
+            addAIMessage(
+                "Sorry, I could not answer your question. Please try again.",
+                "assistant"
+            );
+
+            aiStatus.textContent =
+                error.message || "MENYA AI connection failed.";
+
+        } finally {
+
+            aiSendButton.disabled = false;
+            aiSendButton.textContent = "Send";
+            aiQuestion.focus();
+
+        }
+    });
+
+    // Check logged-in user and load dashboard
     if (!db) {
         showMessage("Database connection is unavailable.");
         return;
@@ -23,7 +325,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
 
-        // Check logged-in user
         const { data: sessionData, error: sessionError } =
             await db.auth.getSession();
 
@@ -40,7 +341,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const user = session.user;
 
-        // Load student profile
         const { data: profile, error: profileError } =
             await db
                 .from("profiles")
@@ -57,61 +357,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         studentName.textContent = name;
         welcomeName.textContent = name;
 
-        // Load student's enrolled courses
-        const { data: enrollments, error: enrollmentError } =
-            await db
-                .from("enrollments")
-                .select(`
-                    course_id,
-                    courses (
-                        id,
-                        title,
-                        description
-                    )
-                `)
-                .eq("student_id", user.id);
+        await loadCourses(user.id);
 
-        if (enrollmentError) {
-            throw enrollmentError;
-        }
-
-        coursesList.innerHTML = "";
-
-        if (!enrollments || enrollments.length === 0) {
-
-            coursesList.textContent =
-                "You have not enrolled in any courses yet.";
-
-        } else {
-
-            enrollments.forEach((enrollment) => {
-
-                const course = enrollment.courses;
-
-                if (!course) return;
-
-                const card = document.createElement("div");
-
-                card.className = "card";
-                card.style.marginTop = "12px";
-
-                const title = document.createElement("h3");
-                title.textContent = course.title;
-
-                const description = document.createElement("p");
-                description.className = "muted";
-                description.style.marginTop = "8px";
-                description.textContent =
-                    course.description || "No course description available.";
-
-                card.appendChild(title);
-                card.appendChild(description);
-
-                coursesList.appendChild(card);
-
-            });
-
-        }
+        await loadVideos();
 
         showMessage("Your dashboard is ready.", "#00c8ff");
 
@@ -125,9 +373,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (error) {
                 console.error("Logout error:", error);
+
                 showMessage("Unable to logout. Please try again.");
+
                 logoutButton.disabled = false;
                 logoutButton.textContent = "Logout";
+
                 return;
             }
 
