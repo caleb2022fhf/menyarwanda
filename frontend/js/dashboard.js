@@ -20,11 +20,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const aiStatus = document.getElementById("ai-status");
 
     function showMessage(text, color = "#ff5555") {
+        if (!message) return;
+
         message.textContent = text;
         message.style.color = color;
     }
 
     function addAIMessage(text, sender = "assistant") {
+
+        if (!aiMessages) return;
+
         const bubble = document.createElement("div");
 
         bubble.className = `ai-message ${sender}`;
@@ -37,7 +42,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function getYouTubeId(value) {
+
         try {
+
             const url = new URL(value);
             let videoId = "";
 
@@ -45,17 +52,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                 url.hostname === "youtu.be" ||
                 url.hostname === "www.youtu.be"
             ) {
-                videoId = url.pathname.split("/").filter(Boolean)[0] || "";
+
+                videoId =
+                    url.pathname.split("/").filter(Boolean)[0] || "";
+
             } else if (
                 url.hostname === "youtube.com" ||
                 url.hostname === "www.youtube.com" ||
                 url.hostname === "m.youtube.com" ||
                 url.hostname === "music.youtube.com"
             ) {
+
                 if (url.pathname === "/watch") {
+
                     videoId = url.searchParams.get("v") || "";
+
                 } else {
-                    const parts = url.pathname.split("/").filter(Boolean);
+
+                    const parts =
+                        url.pathname.split("/").filter(Boolean);
 
                     if (
                         ["embed", "shorts", "live"].includes(parts[0])
@@ -70,7 +85,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 : null;
 
         } catch (error) {
+
             return null;
+
         }
     }
 
@@ -95,8 +112,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         coursesList.innerHTML = "";
 
         if (!enrollments || enrollments.length === 0) {
+
             coursesList.textContent =
                 "You have not enrolled in any courses yet.";
+
             return;
         }
 
@@ -116,8 +135,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const description = document.createElement("p");
             description.className = "muted";
             description.style.marginTop = "8px";
+
             description.textContent =
-                course.description || "No course description available.";
+                course.description ||
+                "No course description available.";
 
             card.appendChild(title);
             card.appendChild(description);
@@ -149,24 +170,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             .order("created_at", { ascending: false });
 
         if (error) {
+
             console.error("Videos loading error:", error);
 
             videosList.innerHTML = `
                 <div class="card empty-state">
-                    Unable to load learning videos. Please refresh the page.
+                    Unable to load learning videos.
+                    Please refresh the page.
                 </div>
             `;
+
             return;
         }
 
         videosList.innerHTML = "";
 
         if (!videos || videos.length === 0) {
+
             videosList.innerHTML = `
                 <div class="card empty-state">
                     No learning videos are available yet.
                 </div>
             `;
+
             return;
         }
 
@@ -182,10 +208,12 @@ document.addEventListener("DOMContentLoaded", async () => {
                 const iframe = document.createElement("iframe");
 
                 iframe.className = "video-frame";
+
                 iframe.src =
                     `https://www.youtube-nocookie.com/embed/${videoId}`;
 
                 iframe.title = video.title || "Learning video";
+
                 iframe.allow =
                     "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 
@@ -197,6 +225,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             } else {
 
                 const invalid = document.createElement("div");
+
                 invalid.className = "empty-state";
                 invalid.textContent = "This video link is invalid.";
 
@@ -211,6 +240,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const description = document.createElement("p");
             description.className = "muted video-description";
+
             description.textContent =
                 video.description || "No description available.";
 
@@ -223,85 +253,131 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // MENYARWANDA AI CONNECTION
     async function sendAIQuestion(question) {
 
-        if (!window.MenyaApp ||
-            typeof window.MenyaApp.request !== "function") {
+        const { data: sessionData, error: sessionError } =
+            await db.auth.getSession();
+
+        if (sessionError || !sessionData.session) {
 
             throw new Error(
-                "MENYA AI connection is not available. Check js/app.js."
+                "Please login again to use MENYARWANDA AI."
             );
         }
 
-        const response = await window.MenyaApp.request("/chat", {
+        const response = await fetch("/api/chat", {
+
             method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization":
+                    `Bearer ${sessionData.session.access_token}`
+            },
+
             body: JSON.stringify({
                 question: question,
                 language: aiLanguage.value
             })
+
         });
 
-        if (!response || !response.answer) {
-            throw new Error("MENYA AI did not return an answer.");
-        }
-
-        return response.answer;
-    }
-
-    aiForm.addEventListener("submit", async (event) => {
-
-        event.preventDefault();
-
-        const question = aiQuestion.value.trim();
-
-        if (!question) {
-            return;
-        }
-
-        if (question.length > 5000) {
-            aiStatus.textContent =
-                "Your question is too long. Please shorten it.";
-            return;
-        }
-
-        addAIMessage(question, "user");
-
-        aiQuestion.value = "";
-        aiSendButton.disabled = true;
-        aiSendButton.textContent = "Thinking...";
-        aiStatus.textContent = "MENYA AI is preparing your answer...";
+        let data;
 
         try {
-
-            const answer = await sendAIQuestion(question);
-
-            addAIMessage(answer, "assistant");
-
-            aiStatus.textContent = "MENYA AI is ready.";
-
+            data = await response.json();
         } catch (error) {
-
-            console.error("MENYA AI error:", error);
-
-            addAIMessage(
-                "Sorry, I could not answer your question. Please try again.",
-                "assistant"
+            throw new Error(
+                "Invalid response from MENYARWANDA AI server."
             );
+        }
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "MENYARWANDA AI connection failed."
+            );
+        }
+
+        if (!data.answer) {
+
+            throw new Error(
+                "MENYARWANDA AI returned no answer."
+            );
+        }
+
+        return data.answer;
+    }
+
+    // AI QUESTION SUBMISSION
+    if (aiForm) {
+
+        aiForm.addEventListener("submit", async (event) => {
+
+            event.preventDefault();
+
+            const question = aiQuestion.value.trim();
+
+            if (!question) {
+                return;
+            }
+
+            if (question.length > 5000) {
+
+                aiStatus.textContent =
+                    "Your question is too long. Please shorten it.";
+
+                return;
+            }
+
+            addAIMessage(question, "user");
+
+            aiQuestion.value = "";
+
+            aiSendButton.disabled = true;
+            aiSendButton.textContent = "Thinking...";
 
             aiStatus.textContent =
-                error.message || "MENYA AI connection failed.";
+                "MENYARWANDA AI is preparing your answer...";
 
-        } finally {
+            try {
 
-            aiSendButton.disabled = false;
-            aiSendButton.textContent = "Send";
-            aiQuestion.focus();
+                const answer = await sendAIQuestion(question);
 
-        }
-    });
+                addAIMessage(answer, "assistant");
 
-    // Check logged-in user and load dashboard
+                aiStatus.textContent =
+                    "MENYARWANDA AI is ready.";
+
+            } catch (error) {
+
+                console.error("MENYARWANDA AI error:", error);
+
+                addAIMessage(
+                    "Sorry, I could not answer your question. Please try again.",
+                    "assistant"
+                );
+
+                aiStatus.textContent =
+                    error.message ||
+                    "MENYARWANDA AI connection failed.";
+
+            } finally {
+
+                aiSendButton.disabled = false;
+                aiSendButton.textContent = "Send";
+                aiQuestion.focus();
+
+            }
+
+        });
+    }
+
+    // CHECK LOGGED-IN USER
     if (!db) {
+
         showMessage("Database connection is unavailable.");
         return;
     }
@@ -318,6 +394,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const session = sessionData.session;
 
         if (!session) {
+
             window.location.replace("login.html");
             return;
         }
@@ -346,7 +423,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         showMessage("Your dashboard is ready.", "#00c8ff");
 
-        // Logout
+        // LOGOUT
         logoutButton.addEventListener("click", async () => {
 
             logoutButton.disabled = true;
@@ -355,6 +432,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const { error } = await db.auth.signOut();
 
             if (error) {
+
                 console.error("Logout error:", error);
 
                 showMessage("Unable to logout. Please try again.");
