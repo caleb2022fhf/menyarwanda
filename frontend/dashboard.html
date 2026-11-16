@@ -9,6 +9,166 @@
     <title>Student Dashboard - MENYARWANDA</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .dashboard-welcome {
+            margin-bottom: 28px;
+        }
+
+        .section-heading {
+            margin: 32px 0 18px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .video-card {
+            overflow: hidden;
+            padding: 0;
+        }
+
+        .video-frame {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: 0;
+            display: block;
+            background: #000;
+        }
+
+        .video-details {
+            padding: 16px;
+        }
+
+        .video-details h3 {
+            margin-bottom: 9px;
+        }
+
+        .video-description {
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .ai-section {
+            margin-top: 35px;
+        }
+
+        .ai-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .ai-language {
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid #263449;
+            background: #101a2a;
+            color: #fff;
+        }
+
+        .ai-chat-box {
+            background: #0b1422;
+            border: 1px solid #263449;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .ai-messages {
+            height: 390px;
+            overflow-y: auto;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .ai-message {
+            max-width: 85%;
+            padding: 13px 15px;
+            border-radius: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .ai-message.assistant {
+            align-self: flex-start;
+            background: #17263a;
+            color: #eaf3ff;
+        }
+
+        .ai-message.user {
+            align-self: flex-end;
+            background: #075985;
+            color: #fff;
+        }
+
+        .ai-input-area {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            border-top: 1px solid #263449;
+        }
+
+        .ai-input-area textarea {
+            flex: 1;
+            min-width: 0;
+            min-height: 48px;
+            max-height: 120px;
+            resize: vertical;
+            padding: 13px;
+            border-radius: 9px;
+            border: 1px solid #263449;
+            background: #101a2a;
+            color: #fff;
+            font: inherit;
+        }
+
+        .ai-input-area button {
+            min-width: 90px;
+            align-self: flex-end;
+        }
+
+        .ai-status {
+            padding: 0 15px 12px;
+            color: #9aabc1;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            padding: 22px;
+            text-align: center;
+            color: #9aabc1;
+        }
+
+        .loading-text {
+            color: #9aabc1;
+        }
+
+        @media (max-width: 600px) {
+            .ai-messages {
+                height: 340px;
+            }
+
+            .ai-message {
+                max-width: 95%;
+            }
+
+            .ai-input-area {
+                flex-direction: column;
+            }
+
+            .ai-input-area button {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -34,29 +194,97 @@
 
     <main class="container" style="padding-top:35px;">
 
-        <section class="card">
-            <h1>Welcome, <span id="welcome-name">Student</span>!</h1>
+        <section class="card dashboard-welcome">
+            <h1>
+                Welcome, <span id="welcome-name">Student</span>!
+            </h1>
 
             <p class="muted" style="margin-top:12px;">
                 Welcome to your MENYARWANDA learning dashboard.
+                Learn through videos and get help from MENYA AI.
             </p>
         </section>
 
-        <h2 style="margin:30px 0 18px;">My Learning</h2>
+        <h2 class="section-heading">My Courses</h2>
 
-        <div class="card">
-            <h3>My Courses</h3>
-
-            <p class="muted" style="margin-top:12px;">
-                Your enrolled courses will appear here.
-            </p>
-
-            <div id="courses-list" style="margin-top:18px;">
+        <section class="card">
+            <div id="courses-list" style="margin-top:5px;">
                 Loading courses...
             </div>
-        </div>
+        </section>
 
-        <h2 style="margin:30px 0 18px;">MENYARWANDA Services</h2>
+        <h2 class="section-heading">Learning Videos</h2>
+
+        <section>
+            <div id="videos-list" class="video-grid">
+                <div class="card empty-state">
+                    Loading learning videos...
+                </div>
+            </div>
+        </section>
+
+        <section class="ai-section">
+
+            <div class="ai-header">
+                <div>
+                    <h2>MENYA AI Assistant</h2>
+                    <p class="muted" style="margin-top:7px;">
+                        Ask questions, understand your lessons and learn more.
+                    </p>
+                </div>
+
+                <select
+                    id="ai-language"
+                    class="ai-language"
+                    aria-label="Choose AI language"
+                >
+                    <option value="rw">Kinyarwanda</option>
+                    <option value="en">English</option>
+                    <option value="fr">Français</option>
+                </select>
+            </div>
+
+            <div class="ai-chat-box">
+
+                <div
+                    id="ai-messages"
+                    class="ai-messages"
+                    aria-live="polite"
+                >
+                    <div class="ai-message assistant">
+                        Muraho! Ndi MENYA AI. Ushobora kumbaza ikibazo
+                        cyangwa ukansaba kugusobanurira isomo.
+                    </div>
+                </div>
+
+                <form id="ai-form" class="ai-input-area">
+
+                    <textarea
+                        id="ai-question"
+                        placeholder="Andika ikibazo cyawe hano..."
+                        maxlength="5000"
+                        required
+                    ></textarea>
+
+                    <button
+                        type="submit"
+                        id="ai-send-button"
+                        class="primary-btn"
+                    >
+                        Send
+                    </button>
+
+                </form>
+
+                <p id="ai-status" class="ai-status">
+                    MENYA AI is ready.
+                </p>
+
+            </div>
+
+        </section>
+
+        <h2 class="section-heading">MENYARWANDA Services</h2>
 
         <div class="grid">
 
@@ -103,6 +331,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase.js"></script>
+    <script src="js/app.js"></script>
     <script src="js/dashboard.js"></script>
 
 </body>
