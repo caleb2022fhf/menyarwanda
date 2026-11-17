@@ -1,4 +1,3 @@
-
 "use strict";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -26,19 +25,119 @@ document.addEventListener("DOMContentLoaded", async () => {
         message.style.color = color;
     }
 
-    function addAIMessage(text, sender = "assistant") {
+    function addAIMessage(text, sender = "assistant", language = "rw") {
 
         if (!aiMessages) return;
 
         const bubble = document.createElement("div");
 
         bubble.className = `ai-message ${sender}`;
-        bubble.textContent = text;
+
+        const messageText = document.createElement("div");
+        messageText.textContent = text;
+        bubble.appendChild(messageText);
+
+        if (sender === "assistant") {
+            const speakButton = document.createElement("button");
+            speakButton.type = "button";
+            speakButton.textContent = "🔊 Listen";
+            speakButton.style.display = "block";
+            speakButton.style.marginTop = "10px";
+            speakButton.style.padding = "8px 14px";
+            speakButton.style.borderRadius = "8px";
+            speakButton.style.cursor = "pointer";
+
+            speakButton.addEventListener("click", async () => {
+                speakButton.disabled = true;
+                speakButton.textContent = "Playing...";
+
+                try {
+                    await speakAIMessage(text, language);
+                } catch (error) {
+                    console.error("Voice error:", error);
+                    if (aiStatus) {
+                        aiStatus.textContent =
+                            "Unable to play the voice. Please try again.";
+                    }
+                } finally {
+                    speakButton.disabled = false;
+                    speakButton.textContent = "🔊 Listen";
+                }
+            });
+
+            bubble.appendChild(speakButton);
+        }
 
         aiMessages.appendChild(bubble);
         aiMessages.scrollTop = aiMessages.scrollHeight;
 
         return bubble;
+    }
+
+    async function speakAIMessage(text, language = "rw") {
+
+        if (language === "rw") {
+            if (window.menyarwandaAudio) {
+                window.menyarwandaAudio.pause();
+                window.menyarwandaAudio.currentTime = 0;
+            }
+
+            if ("speechSynthesis" in window) {
+                window.speechSynthesis.cancel();
+            }
+
+            const response = await fetch("/api/tts", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    text: text.trim(),
+                    language: "rw"
+                })
+            });
+
+            let data;
+            try {
+                data = await response.json();
+            } catch (error) {
+                throw new Error("Invalid response from the voice server.");
+            }
+
+            if (!response.ok || !data.audioUrl) {
+                throw new Error(
+                    data.message || "Kinyarwanda voice could not be generated."
+                );
+            }
+
+            window.menyarwandaAudio = new Audio(data.audioUrl);
+            await window.menyarwandaAudio.play();
+            return;
+        }
+
+        if (!("speechSynthesis" in window)) {
+            throw new Error("Your browser does not support voice.");
+        }
+
+        window.speechSynthesis.cancel();
+
+        const speech = new SpeechSynthesisUtterance(text.trim());
+        const languageCodes = {
+            en: "en-US",
+            fr: "fr-FR"
+        };
+
+        speech.lang = languageCodes[language] || "en-US";
+        speech.rate = 0.85;
+        speech.pitch = 1;
+
+        await new Promise((resolve, reject) => {
+            speech.onend = resolve;
+            speech.onerror = () => reject(
+                new Error("Browser voice playback failed.")
+            );
+            window.speechSynthesis.speak(speech);
+        });
     }
 
     function getYouTubeId(value) {
@@ -254,7 +353,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // MENYARWANDA AI CONNECTION
-    async function sendAIQuestion(question) {
+    async function sendAIQuestion(question, language = "rw") {
 
         const { data: sessionData, error: sessionError } =
             await db.auth.getSession();
@@ -278,7 +377,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             body: JSON.stringify({
                 question: question,
-                language: aiLanguage.value
+                language: language
             })
 
         });
@@ -319,6 +418,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             event.preventDefault();
 
             const question = aiQuestion.value.trim();
+            const questionLanguage = aiLanguage ? aiLanguage.value : "rw";
 
             if (!question) {
                 return;
@@ -326,8 +426,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (question.length > 5000) {
 
-                aiStatus.textContent =
-                    "Your question is too long. Please shorten it.";
+                if (aiStatus) {
+                    aiStatus.textContent =
+                        "Your question is too long. Please shorten it.";
+                }
 
                 return;
             }
@@ -339,17 +441,21 @@ document.addEventListener("DOMContentLoaded", async () => {
             aiSendButton.disabled = true;
             aiSendButton.textContent = "Thinking...";
 
-            aiStatus.textContent =
-                "MENYARWANDA AI is preparing your answer...";
+            if (aiStatus) {
+                aiStatus.textContent =
+                    "MENYARWANDA AI is preparing your answer...";
+            }
 
             try {
 
-                const answer = await sendAIQuestion(question);
+                const answer = await sendAIQuestion(question, questionLanguage);
 
-                addAIMessage(answer, "assistant");
+                addAIMessage(answer, "assistant", questionLanguage);
 
-                aiStatus.textContent =
-                    "MENYARWANDA AI is ready.";
+                if (aiStatus) {
+                    aiStatus.textContent =
+                        "MENYARWANDA AI is ready.";
+                }
 
             } catch (error) {
 
@@ -360,9 +466,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                     "assistant"
                 );
 
-                aiStatus.textContent =
-                    error.message ||
-                    "MENYARWANDA AI connection failed.";
+                if (aiStatus) {
+                    aiStatus.textContent =
+                        error.message ||
+                        "MENYARWANDA AI connection failed.";
+                }
 
             } finally {
 
