@@ -9,6 +9,64 @@
     <title>Register - MENYARWANDA</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .service-selection {
+            border: 1px solid #26364d;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .service-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px;
+            margin-top: 12px;
+            border: 1px solid #26364d;
+            border-radius: 10px;
+            cursor: pointer;
+            background: #111b2d;
+        }
+
+        .service-option:has(input:checked) {
+            border-color: #00c8ff;
+            background: #10283a;
+        }
+
+        .service-option input {
+            margin-top: 4px;
+            accent-color: #00c8ff;
+        }
+
+        .service-option span {
+            display: block;
+        }
+
+        .service-name {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .service-description {
+            color: #aab8ca;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .service-extra {
+            color: #00c8ff;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .service-loading {
+            text-align: center;
+            padding: 18px;
+            color: #aab8ca;
+        }
+    </style>
 </head>
 
 <body>
@@ -82,15 +140,35 @@
                     Use at least 8 characters, including letters and numbers.
                 </p>
 
-                <button type="submit" class="primary-btn" id="register-button">
+                <fieldset class="service-selection">
+                    <legend style="font-weight:bold;padding:0 6px;">
+                        Select Your Digital Service
+                    </legend>
+
+                    <p class="muted" style="font-size:13px;margin:8px 0;">
+                        Choose one service you want to join.
+                    </p>
+
+                    <div id="services-list" aria-live="polite">
+                        <p class="service-loading">Loading available services...</p>
+                    </div>
+                </fieldset>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                    id="register-button"
+                    disabled
+                >
                     Create Account
                 </button>
 
-                <p id="register-message"
-                   role="status"
-                   aria-live="polite"
-                   style="margin-top:18px;text-align:center;">
-                </p>
+                <p
+                    id="register-message"
+                    role="status"
+                    aria-live="polite"
+                    style="margin-top:18px;text-align:center;"
+                ></p>
 
             </form>
 
