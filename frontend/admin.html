@@ -71,6 +71,11 @@ td{color:#d5deea}
 .empty{color:#91a0b5;padding:15px 0}
 .video-frame{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000;margin-top:15px}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.service-group{grid-column:1/-1;margin-top:20px}
+.service-group h2{color:#00c8ff;border-bottom:1px solid #26364e;padding-bottom:12px}
+.video-card{border-color:#24506b}
+.video-actions{display:flex;flex-wrap:wrap;gap:5px}
+.user-avatar{width:38px;height:38px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px}
 @media(max-width:850px){
 .sidebar{transform:translateX(-100%);transition:.25s}
 .sidebar.open{transform:translateX(0)}
@@ -128,10 +133,10 @@ td{color:#d5deea}
 <h2>Platform Management</h2>
 <div class="module-grid">
 <div class="module-card" data-open="users"><div class="module-icon">♙</div><h3>Users Management</h3><p>View and manage registered users.</p></div>
-<div class="module-card" data-open="courses"><div class="module-icon">▤</div><h3>Courses</h3><p>View courses and their videos grouped by service.</p></div>
+<div class="module-card" data-open="courses"><div class="module-icon">▤</div><h3>Courses</h3><p>View all learning videos grouped by Digital Service.</p></div>
 <div class="module-card" data-open="attendance"><div class="module-icon">◷</div><h3>Attendance</h3><p>Monitor how many times each student has studied.</p></div>
-<div class="module-card" data-open="digital"><div class="module-icon">◇</div><h3>Digital Services</h3><p>Create services and courses under each service.</p></div>
-<div class="module-card" data-open="videohub"><div class="module-icon">▷</div><h3>VideoHub</h3><p>Add YouTube videos to courses.</p></div>
+<div class="module-card" data-open="digital"><div class="module-icon">◇</div><h3>Digital Services</h3><p>Create and manage services available on the platform.</p></div>
+<div class="module-card" data-open="videohub"><div class="module-icon">▷</div><h3>VideoHub</h3><p>Add YouTube videos and assign them to a Digital Service.</p></div>
 <div class="module-card" data-open="reports"><div class="module-icon">▥</div><h3>Reports</h3><p>View recorded platform activities.</p></div>
 </div>
 </section>
@@ -148,23 +153,17 @@ td{color:#d5deea}
 
 <section class="page-section" id="page-courses">
 <button class="back-button" data-back>← Overview</button>
-<div class="page-heading"><h1>Courses Management</h1><p class="muted">Courses and learning videos grouped by Digital Service.</p></div>
-<div class="panel-placeholder">
-<h3 id="course-form-heading">Add Course</h3>
-<form id="course-form">
-<label>Course title</label><input id="course-title" maxlength="200" required>
-<label>Description</label><textarea id="course-description" rows="3"></textarea>
-<label>Digital Service</label><select id="course-service" required><option value="">Select service</option></select>
-<label>Image URL (optional)</label><input id="course-image" type="url">
-<label>Status</label><select id="course-active"><option value="true">Active</option><option value="false">Inactive</option></select>
-<button class="action primary" id="save-course">Add Course</button>
-<button class="action secondary" type="button" id="cancel-course" hidden>Cancel</button>
-<p id="course-message" class="message"></p>
-</form>
+<div class="page-heading">
+<h1>Courses - Learning Videos</h1>
+<p class="muted">All learning videos are displayed here and automatically grouped according to their Digital Service.</p>
 </div>
-<div class="panel-placeholder" style="margin-top:20px">
-<div class="toolbar"><input id="course-search" placeholder="Search courses"><button class="action secondary" id="refresh-courses">Refresh</button></div>
+<div class="panel-placeholder">
+<div class="toolbar">
+<input id="course-search" placeholder="Search video title or description">
+<button class="action secondary" id="refresh-courses">Refresh Videos</button>
+</div>
 <div id="course-list" class="data-list"></div>
+<p id="course-message" class="message"></p>
 </div>
 </section>
 
@@ -203,16 +202,23 @@ td{color:#d5deea}
 
 <section class="page-section" id="page-videohub">
 <button class="back-button" data-back>← Overview</button>
-<div class="page-heading"><h1>VideoHub - Video Upload Tool</h1><p class="muted">Add YouTube videos to courses. Videos are displayed in Courses, not in this VideoHub page.</p></div>
+<div class="page-heading">
+<h1>VideoHub - Add Learning Video</h1>
+<p class="muted">Add a YouTube video and choose the Digital Service it belongs to. The video will automatically appear in Courses under that service.</p>
+</div>
 <div class="panel-placeholder">
 <form id="video-form">
 <label>Video title</label><input id="video-title" maxlength="200" required>
 <label>Description</label><textarea id="video-description" rows="3"></textarea>
-<label>Choose Digital Service and Course</label><select id="video-course" required><option value="">Select course</option></select>
+<label>Choose Digital Service</label>
+<select id="video-service" required><option value="">Select Digital Service</option></select>
 <label>YouTube URL</label><input id="video-url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
-<div id="video-preview-container" hidden><h3>Preview</h3><div class="video-frame"><iframe id="video-preview" title="Video preview" allowfullscreen></iframe></div></div>
+<div id="video-preview-container" hidden>
+<h3>Preview</h3>
+<div class="video-frame"><iframe id="video-preview" title="Video preview" allowfullscreen></iframe></div>
+</div>
 <button type="button" class="action secondary" id="preview-video">Preview</button>
-<button class="action primary" id="save-video">Add Video to Course</button>
+<button class="action primary" id="save-video">Add Video to Courses</button>
 <p id="video-message" class="message"></p>
 </form>
 </div>
@@ -240,35 +246,62 @@ document.addEventListener("DOMContentLoaded", async () => {
 const db = window.MENYARWANDA_DB;
 const $ = id => document.getElementById(id);
 const msg = (id,text,error=false) => {
+if($(id)){
 $(id).textContent = text || "";
 $(id).style.color = error ? "#ff7777" : "#91a0b5";
+}
 };
 const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
 const date = value => value ? new Date(value).toLocaleString() : "-";
 const setBusy = (id,busy) => { if($(id)) $(id).disabled = busy; };
 
-if(!db){$("admin-message").textContent="Database connection unavailable. Check js/supabase.js.";return;}
+if(!db){
+$("admin-message").textContent="Database connection unavailable. Check js/supabase.js.";
+return;
+}
 
 const {data:sessionData,error:sessionError}=await db.auth.getSession();
-if(sessionError || !sessionData.session){location.replace("login.html");return;}
-const user=sessionData.session.user;
+if(sessionError || !sessionData.session){
+location.replace("login.html");
+return;
+}
 
+const user=sessionData.session.user;
 const {data:profile,error:profileError}=await db.from("profiles").select("full_name,role").eq("id",user.id).single();
-if(profileError || !profile || profile.role!=="admin"){await db.auth.signOut();location.replace("login.html");return;}
+
+if(profileError || !profile || profile.role!=="admin"){
+await db.auth.signOut();
+location.replace("login.html");
+return;
+}
 
 $("admin-name").textContent=profile.full_name || "Administrator";
 $("welcome-name").textContent=profile.full_name || "Administrator";
 $("admin-message").textContent="Administrator access verified.";
 
 async function logAction(action,details){
-const {error}=await db.from("admin_activity_logs").insert({admin_id:user.id,action,details});
-if(error) console.warn("Activity log error:",error.message);
+const {error}=await db.from("admin_activity_logs").insert({
+admin_id:user.id,
+action,
+details:{description:String(details || "")}
+});
+if(error)console.warn("Activity log error:",error.message);
 }
 
 const pages=["overview","users","courses","attendance","digital","videohub","reports"];
-const titles={overview:"Dashboard Overview",users:"Users Management",courses:"Courses Management",attendance:"Attendance Management",digital:"Digital Services",videohub:"VideoHub",reports:"Platform Reports"};
+const titles={
+overview:"Dashboard Overview",
+users:"Users Management",
+courses:"Courses - Learning Videos",
+attendance:"Attendance Management",
+digital:"Digital Services",
+videohub:"VideoHub",
+reports:"Platform Reports"
+};
+
 const sections=document.querySelectorAll(".page-section");
 const nav=document.querySelectorAll(".nav-button");
+
 function openPage(page){
 if(!pages.includes(page))return;
 sections.forEach(s=>s.classList.remove("active"));
@@ -277,295 +310,617 @@ nav.forEach(b=>b.classList.toggle("active",b.dataset.page===page));
 $("current-page-title").textContent=titles[page];
 $("sidebar").classList.remove("open");
 window.scrollTo({top:0,behavior:"smooth"});
-const loaders={overview:loadStats,users:loadUsers,courses:loadCourses,attendance:loadAttendance,digital:loadServices,videohub:loadCourseOptions,reports:loadReports};
+
+const loaders={
+overview:loadStats,
+users:loadUsers,
+courses:loadCourses,
+attendance:loadAttendance,
+digital:loadServices,
+videohub:loadVideoServiceOptions,
+reports:loadReports
+};
 loaders[page]?.();
 }
+
 nav.forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.page)));
 document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.open)));
 document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",()=>openPage("overview")));
 $("mobile-menu").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
-$("logout-button").addEventListener("click",async()=>{await db.auth.signOut();location.replace("login.html");});
+$("logout-button").addEventListener("click",async()=>{
+await db.auth.signOut();
+location.replace("login.html");
+});
 
 async function count(table){
 const {count,error}=await db.from(table).select("*",{count:"exact",head:true});
 if(error)throw error;
 return count||0;
 }
+
 async function loadStats(){
-const targets=[["profiles","total-users"],["courses","total-courses"],["attendance","total-attendance"],["digital_services","total-services"],["menyarwanda_videos","total-videos"]];
+const targets=[
+["profiles","total-users"],
+["courses","total-courses"],
+["attendance","total-attendance"],
+["digital_services","total-services"],
+["menyarwanda_videos","total-videos"]
+];
 for(const [table,id] of targets){
-try{$(id).textContent=(await count(table)).toLocaleString();}
-catch(e){$(id).textContent="Error";console.error(table,e);}
+try{
+$(id).textContent=(await count(table)).toLocaleString();
+}catch(e){
+$(id).textContent="Error";
+console.error(table,e);
+}
 }
 }
 
 let services=[];
-let courses=[];
 let videos=[];
 
 async function loadServices(){
 $("service-list").innerHTML='<p class="empty">Loading services...</p>';
 const {data,error}=await db.from("digital_services").select("*").order("created_at",{ascending:false});
-if(error){$("service-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';return;}
+if(error){
+$("service-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';
+return;
+}
 services=data||[];
 renderServices();
 await fillServiceSelects();
 }
+
 function renderServices(){
 const q=$("service-search").value.toLowerCase().trim();
-const rows=services.filter(s=>(s.name||"").toLowerCase().includes(q)||(s.category||"").toLowerCase().includes(q));
-if(!rows.length){$("service-list").innerHTML='<p class="empty">No services found.</p>';return;}
+const rows=services.filter(s=>
+(s.name||"").toLowerCase().includes(q)||
+(s.category||"").toLowerCase().includes(q)
+);
+
+if(!rows.length){
+$("service-list").innerHTML='<p class="empty">No services found.</p>';
+return;
+}
+
 $("service-list").innerHTML=rows.map(s=>`
 <article class="data-card">
 ${s.image_url?`<img src="${esc(s.image_url)}" alt="">`:""}
-<h4>${esc(s.name)}</h4><p>${esc(s.description||"No description")}</p>
+<h4>${esc(s.name)}</h4>
+<p>${esc(s.description||"No description")}</p>
 <p>Category: ${esc(s.category||"Uncategorized")}</p>
 <p><strong>${Number(s.price||0).toLocaleString()} ${esc(s.currency||"RWF")}</strong></p>
 <span class="status ${s.is_active?"active-status":"inactive-status"}">${s.is_active?"Active":"Inactive"}</span>
 <div>
-<button class="action secondary" data-edit-service="${s.id}">Edit</button>
-<button class="action secondary" data-toggle-service="${s.id}">${s.is_active?"Deactivate":"Activate"}</button>
-<button class="action danger" data-delete-service="${s.id}">Delete</button>
-</div></article>`).join("");
+<button class="action secondary" data-edit-service="${esc(s.id)}">Edit</button>
+<button class="action secondary" data-toggle-service="${esc(s.id)}">${s.is_active?"Deactivate":"Activate"}</button>
+<button class="action danger" data-delete-service="${esc(s.id)}">Delete</button>
+</div>
+</article>`).join("");
+
 $("service-list").querySelectorAll("[data-edit-service]").forEach(b=>b.onclick=()=>editService(b.dataset.editService));
 $("service-list").querySelectorAll("[data-toggle-service]").forEach(b=>b.onclick=()=>toggleService(b.dataset.toggleService));
 $("service-list").querySelectorAll("[data-delete-service]").forEach(b=>b.onclick=()=>deleteService(b.dataset.deleteService));
 }
+
 let editingService=null;
+
 function resetService(){
-$("service-form").reset();$("service-price").value=0;$("service-active").value="true";
-editingService=null;$("save-service").textContent="Add Service";$("cancel-service").hidden=true;
+$("service-form").reset();
+$("service-price").value=0;
+$("service-active").value="true";
+editingService=null;
+$("save-service").textContent="Add Service";
+$("cancel-service").hidden=true;
 $("service-form-heading").textContent="Add New Digital Service";
 }
+
 function editService(id){
-const s=services.find(x=>String(x.id)===String(id));if(!s)return;
-editingService=id;$("service-name").value=s.name||"";$("service-description").value=s.description||"";
-$("service-category").value=s.category||"";$("service-price").value=s.price??0;
-$("service-image").value=s.image_url||"";$("service-active").value=String(!!s.is_active);
-$("save-service").textContent="Save Changes";$("cancel-service").hidden=false;$("service-form-heading").textContent="Edit Digital Service";
+const s=services.find(x=>String(x.id)===String(id));
+if(!s)return;
+editingService=id;
+$("service-name").value=s.name||"";
+$("service-description").value=s.description||"";
+$("service-category").value=s.category||"";
+$("service-price").value=s.price??0;
+$("service-image").value=s.image_url||"";
+$("service-active").value=String(!!s.is_active);
+$("save-service").textContent="Save Changes";
+$("cancel-service").hidden=false;
+$("service-form-heading").textContent="Edit Digital Service";
 window.scrollTo({top:0,behavior:"smooth"});
 }
+
 $("service-form").addEventListener("submit",async e=>{
-e.preventDefault();setBusy("save-service",true);
-const data={name:$("service-name").value.trim(),description:$("service-description").value.trim(),category:$("service-category").value.trim(),price:Number($("service-price").value),currency:"RWF",image_url:$("service-image").value.trim()||null,is_active:$("service-active").value==="true"};
+e.preventDefault();
+setBusy("save-service",true);
+
+const data={
+name:$("service-name").value.trim(),
+description:$("service-description").value.trim(),
+category:$("service-category").value.trim(),
+price:Number($("service-price").value),
+currency:"RWF",
+image_url:$("service-image").value.trim()||null,
+is_active:$("service-active").value==="true"
+};
+
 try{
 if(!data.name||!Number.isFinite(data.price)||data.price<0)throw Error("Enter a valid service name and price.");
-const result=editingService?await db.from("digital_services").update(data).eq("id",editingService):await db.from("digital_services").insert(data);
+
+const wasEditing=!!editingService;
+const result=wasEditing
+?await db.from("digital_services").update(data).eq("id",editingService)
+:await db.from("digital_services").insert(data);
+
 if(result.error)throw result.error;
-await logAction(editingService?"Updated digital service":"Created digital service",data.name);
+
+await logAction(wasEditing?"Updated digital service":"Created digital service",data.name);
 msg("service-message","Service saved successfully.");
-resetService();await loadServices();await loadStats();
-}catch(err){msg("service-message",err.message,true);}
-finally{setBusy("save-service",false);}
+resetService();
+await loadServices();
+await loadStats();
+}catch(err){
+msg("service-message",err.message,true);
+}finally{
+setBusy("save-service",false);
+}
 });
+
 async function toggleService(id){
-const s=services.find(x=>String(x.id)===String(id));if(!s)return;
+const s=services.find(x=>String(x.id)===String(id));
+if(!s)return;
 const {error}=await db.from("digital_services").update({is_active:!s.is_active}).eq("id",id);
 if(error){alert(error.message);return;}
 await logAction("Changed service status",s.name+" → "+(!s.is_active?"Active":"Inactive"));
 await loadServices();
+await loadVideoServiceOptions();
 }
+
 async function deleteService(id){
-const s=services.find(x=>String(x.id)===String(id));if(!s||!confirm("Delete service "+s.name+"?"))return;
+const s=services.find(x=>String(x.id)===String(id));
+if(!s||!confirm("Delete service "+s.name+"? Videos assigned to it may become unassigned."))return;
 const {error}=await db.from("digital_services").delete().eq("id",id);
 if(error){alert(error.message);return;}
-await logAction("Deleted digital service",s.name);await loadServices();await loadStats();
+await logAction("Deleted digital service",s.name);
+await loadServices();
+await loadCourses();
+await loadStats();
 }
+
 $("cancel-service").onclick=resetService;
 $("refresh-services").onclick=loadServices;
 $("service-search").oninput=renderServices;
 
 async function fillServiceSelects(){
-const options='<option value="">Select service</option>'+services.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
-$("course-service").innerHTML=options;
+const activeServices=services.filter(s=>s.is_active);
+const options='<option value="">Select Digital Service</option>'+
+activeServices.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+
+$("video-service").innerHTML=options;
 }
-async function fillCourseSelect(){
-const {data,error}=await db.from("courses").select("id,title,service_id").order("title");
-if(error){msg("video-message",error.message,true);return;}
-courses=data||[];
-$("video-course").innerHTML='<option value="">Select course</option>'+courses.map(c=>{
-const service=services.find(s=>String(s.id)===String(c.service_id));
-return `<option value="${esc(c.id)}">${esc(service?.name||"Unassigned")} — ${esc(c.title)}</option>`;
-}).join("");
-}
-let editingCourse=null;
-function resetCourse(){
-$("course-form").reset();editingCourse=null;$("save-course").textContent="Add Course";$("cancel-course").hidden=true;$("course-form-heading").textContent="Add Course";
-}
-async function loadCourses(){
-$("course-list").innerHTML='<p class="empty">Loading courses...</p>';
+
+async function loadVideoServiceOptions(){
 await loadServices();
-const {data,error}=await db.from("courses").select("*").order("created_at",{ascending:false});
-if(error){$("course-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';return;}
-courses=data||[];
-const {data:videoData,error:videoError}=await db.from("menyarwanda_videos").select("*").order("created_at",{ascending:false});
-if(videoError){console.error(videoError);videos=[];}else videos=videoData||[];
-renderCourses();
-await fillCourseSelect();
 }
+
+async function loadCourses(){
+$("course-list").innerHTML='<p class="empty">Loading learning videos...</p>';
+msg("course-message","");
+
+const serviceResult=await db.from("digital_services").select("id,name,category").order("name");
+if(serviceResult.error){
+$("course-list").innerHTML='<p class="empty">'+esc(serviceResult.error.message)+'</p>';
+return;
+}
+services=serviceResult.data||[];
+
+const {data,error}=await db.from("menyarwanda_videos")
+.select("id,title,description,youtube_url,thumbnail_url,published,created_at,service_id")
+.order("created_at",{ascending:false});
+
+if(error){
+$("course-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';
+msg("course-message",error.message,true);
+return;
+}
+
+videos=data||[];
+renderCourses();
+}
+
+function getYouTubeId(value){
+try{
+const u=new URL(value.trim());
+const host=u.hostname.replace(/^www\./,"");
+let id="";
+
+if(host==="youtu.be"){
+id=u.pathname.split("/").filter(Boolean)[0]||"";
+}else if(["youtube.com","m.youtube.com","youtube-nocookie.com"].includes(host)){
+if(u.pathname==="/watch"){
+id=u.searchParams.get("v")||"";
+}else{
+const p=u.pathname.split("/").filter(Boolean);
+if(p.length>1&&["embed","shorts","live"].includes(p[0]))id=p[1];
+}
+}
+return /^[a-zA-Z0-9_-]{11}$/.test(id)?id:null;
+}catch{
+return null;
+}
+}
+
 function renderCourses(){
 const q=$("course-search").value.toLowerCase().trim();
-const rows=courses.filter(c=>(c.title||"").toLowerCase().includes(q)||(c.description||"").toLowerCase().includes(q));
-if(!rows.length){$("course-list").innerHTML='<p class="empty">No courses found.</p>';return;}
+
+const rows=videos.filter(v=>
+(v.title||"").toLowerCase().includes(q)||
+(v.description||"").toLowerCase().includes(q)
+);
+
+if(!rows.length){
+$("course-list").innerHTML='<p class="empty">No learning videos found. Add videos through VideoHub.</p>';
+return;
+}
+
 const groups={};
-rows.forEach(c=>{
-const s=services.find(x=>String(x.id)===String(c.service_id));
-const key=s?.name||"Unassigned service";
-(groups[key]??=[]).push(c);
+
+rows.forEach(v=>{
+const service=services.find(s=>String(s.id)===String(v.service_id));
+const groupName=service?.name||"Unassigned Service";
+if(!groups[groupName])groups[groupName]=[];
+groups[groupName].push(v);
 });
+
 $("course-list").innerHTML=Object.entries(groups).map(([group,items])=>`
-<div style="grid-column:1/-1"><h2 style="color:#00c8ff">${esc(group)}</h2></div>
-${items.map(c=>{
-const cv=videos.filter(v=>String(v.course_id)===String(c.id));
-return `<article class="data-card">
-${c.image_url?`<img src="${esc(c.image_url)}" alt="">`:""}
-<h4>${esc(c.title)}</h4><p>${esc(c.description||"No description")}</p>
-<span class="status ${c.is_active?"active-status":"inactive-status"}">${c.is_active?"Active":"Inactive"}</span>
-<p><strong>${cv.length} learning video(s)</strong></p>
-${cv.map(v=>`<p>▶ ${esc(v.title)} ${v.published?"":"(Unpublished)"}</p>`).join("")}
-<button class="action secondary" data-edit-course="${c.id}">Edit</button>
-<button class="action danger" data-delete-course="${c.id}">Delete</button>
+<div class="service-group">
+<h2>${esc(group)} <small style="color:#91a0b5;font-size:13px">(${items.length} videos)</small></h2>
+</div>
+${items.map(v=>{
+const youtubeId=getYouTubeId(v.youtube_url||"");
+const thumbnail=v.thumbnail_url||(youtubeId?"https://img.youtube.com/vi/"+youtubeId+"/hqdefault.jpg":"");
+
+return `
+<article class="data-card video-card">
+${thumbnail?`<img src="${esc(thumbnail)}" alt="${esc(v.title)}">`:""}
+<h4>${esc(v.title)}</h4>
+<p>${esc(v.description||"No description")}</p>
+<p>Added: ${esc(date(v.created_at))}</p>
+<span class="status ${v.published?"active-status":"inactive-status"}">${v.published?"Published":"Unpublished"}</span>
+${youtubeId?`<div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${esc(youtubeId)}" title="${esc(v.title)}" loading="lazy" allowfullscreen></iframe></div>`:""}
+<div class="video-actions">
+<button class="action secondary" data-edit-video="${esc(v.id)}">Edit</button>
+<button class="action secondary" data-toggle-video="${esc(v.id)}">${v.published?"Unpublish":"Publish"}</button>
+<button class="action danger" data-delete-video="${esc(v.id)}">Delete</button>
+</div>
 </article>`;
 }).join("")}`).join("");
-$("course-list").querySelectorAll("[data-edit-course]").forEach(b=>b.onclick=()=>editCourse(b.dataset.editCourse));
-$("course-list").querySelectorAll("[data-delete-course]").forEach(b=>b.onclick=()=>deleteCourse(b.dataset.deleteCourse));
+
+$("course-list").querySelectorAll("[data-edit-video]").forEach(b=>b.onclick=()=>editVideo(b.dataset.editVideo));
+$("course-list").querySelectorAll("[data-toggle-video]").forEach(b=>b.onclick=()=>toggleVideo(b.dataset.toggleVideo));
+$("course-list").querySelectorAll("[data-delete-video]").forEach(b=>b.onclick=()=>deleteVideo(b.dataset.deleteVideo));
 }
-$("course-form").addEventListener("submit",async e=>{
-e.preventDefault();setBusy("save-course",true);
-const data={title:$("course-title").value.trim(),description:$("course-description").value.trim(),service_id:$("course-service").value||null,image_url:$("course-image").value.trim()||null,is_active:$("course-active").value==="true"};
-try{
-if(!data.title||!data.service_id)throw Error("Enter a title and select a service.");
-const result=editingCourse?await db.from("courses").update(data).eq("id",editingCourse):await db.from("courses").insert(data);
-if(result.error)throw result.error;
-await logAction(editingCourse?"Updated course":"Created course",data.title);
-msg("course-message","Course saved successfully.");resetCourse();await loadCourses();await loadStats();
-}catch(err){msg("course-message",err.message,true);}
-finally{setBusy("save-course",false);}
+
+function editVideo(id){
+const v=videos.find(x=>String(x.id)===String(id));
+if(!v)return;
+
+const title=prompt("Video title:",v.title||"");
+if(title===null)return;
+const description=prompt("Video description:",v.description||"");
+if(description===null)return;
+const url=prompt("YouTube URL:",v.youtube_url||"");
+if(url===null)return;
+
+const serviceOptions=services.filter(s=>s.is_active);
+const serviceNames=serviceOptions.map((s,i)=>(i+1)+". "+s.name).join("\n");
+const choice=prompt("Choose service number:\n"+serviceNames,
+String(Math.max(1,serviceOptions.findIndex(s=>String(s.id)===String(v.service_id))+1)));
+if(choice===null)return;
+
+const selected=serviceOptions[Number(choice)-1];
+if(!selected){alert("Invalid service selection.");return;}
+
+const youtubeId=getYouTubeId(url);
+if(!youtubeId){alert("Enter a valid YouTube URL.");return;}
+
+updateVideo(id,{
+title:title.trim(),
+description:description.trim(),
+youtube_url:url.trim(),
+thumbnail_url:"https://img.youtube.com/vi/"+youtubeId+"/hqdefault.jpg",
+service_id:selected.id
 });
-function editCourse(id){
-const c=courses.find(x=>String(x.id)===String(id));if(!c)return;
-editingCourse=id;$("course-title").value=c.title||"";$("course-description").value=c.description||"";
-$("course-service").value=c.service_id||"";$("course-image").value=c.image_url||"";
-$("course-active").value=String(!!c.is_active);$("save-course").textContent="Save Changes";
-$("cancel-course").hidden=false;$("course-form-heading").textContent="Edit Course";window.scrollTo({top:0,behavior:"smooth"});
 }
-async function deleteCourse(id){
-const c=courses.find(x=>String(x.id)===String(id));if(!c||!confirm("Delete course "+c.title+"?"))return;
-const {error}=await db.from("courses").delete().eq("id",id);
+
+async function updateVideo(id,data){
+const {error}=await db.from("menyarwanda_videos").update(data).eq("id",id);
 if(error){alert(error.message);return;}
-await logAction("Deleted course",c.title);await loadCourses();await loadStats();
+await logAction("Updated learning video",data.title);
+await loadCourses();
+await loadStats();
 }
-$("cancel-course").onclick=resetCourse;
+
+async function toggleVideo(id){
+const v=videos.find(x=>String(x.id)===String(id));
+if(!v)return;
+
+const {error}=await db.from("menyarwanda_videos")
+.update({published:!v.published}).eq("id",id);
+
+if(error){alert(error.message);return;}
+await logAction(v.published?"Unpublished learning video":"Published learning video",v.title);
+await loadCourses();
+await loadStats();
+}
+
+async function deleteVideo(id){
+const v=videos.find(x=>String(x.id)===String(id));
+if(!v||!confirm("Delete video "+v.title+"?"))return;
+
+const {error}=await db.from("menyarwanda_videos").delete().eq("id",id);
+if(error){alert(error.message);return;}
+
+await logAction("Deleted learning video",v.title);
+await loadCourses();
+await loadStats();
+}
+
 $("refresh-courses").onclick=loadCourses;
 $("course-search").oninput=renderCourses;
 
-async function loadCourseOptions(){
-await loadServices();await fillCourseSelect();
-}
-
 async function loadUsers(){
 $("users-table").innerHTML='<tr><td colspan="5">Loading users...</td></tr>';
-const {data,error}=await db.from("profiles").select("id,full_name,phone,photo_url,role,created_at").order("created_at",{ascending:false});
-if(error){$("users-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;return;}
+
+const {data,error}=await db.from("profiles")
+.select("id,full_name,phone,photo_url,role,created_at")
+.order("created_at",{ascending:false});
+
+if(error){
+$("users-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;
+return;
+}
+
 const q=$("user-search").value.toLowerCase().trim();
-const rows=(data||[]).filter(p=>(p.full_name||"").toLowerCase().includes(q)||(p.phone||"").toLowerCase().includes(q));
-$("users-table").innerHTML=rows.map(p=>`<tr>
-<td>${esc(p.full_name||"Unnamed")}</td><td>${esc(p.phone||"-")}</td><td>${esc(p.role||"-")}</td><td>${esc(date(p.created_at))}</td>
-<td><button class="action secondary" data-user-edit="${p.id}">Edit</button></td></tr>`).join("")||'<tr><td colspan="5">No users found.</td></tr>';
+const rows=(data||[]).filter(p=>
+(p.full_name||"").toLowerCase().includes(q)||
+(p.phone||"").toLowerCase().includes(q)
+);
+
+$("users-table").innerHTML=rows.map(p=>`
+<tr>
+<td>${p.photo_url?`<img class="user-avatar" src="${esc(p.photo_url)}" alt="">`:""}${esc(p.full_name||"Unnamed")}</td>
+<td>${esc(p.phone||"-")}</td>
+<td>${esc(p.role||"-")}</td>
+<td>${esc(date(p.created_at))}</td>
+<td><button class="action secondary" data-user-edit="${esc(p.id)}">Edit</button></td>
+</tr>`).join("")||'<tr><td colspan="5">No users found.</td></tr>';
+
 $("users-table").querySelectorAll("[data-user-edit]").forEach(b=>b.onclick=()=>editUser(b.dataset.userEdit,data));
 }
+
 function editUser(id,data){
-const p=data.find(x=>String(x.id)===String(id));if(!p)return;
-const name=prompt("User full name:",p.full_name||"");if(name===null)return;
-const phone=prompt("User phone:",p.phone||"");if(phone===null)return;
-const role=prompt("User role (student or admin):",p.role||"student");if(role===null)return;
-if(!["student","admin"].includes(role.trim().toLowerCase())){alert("Role must be student or admin.");return;}
-if(String(p.id)===String(user.id)&&role.trim().toLowerCase()!=="admin"){alert("You cannot remove your own admin role.");return;}
-updateUser(p.id,{full_name:name.trim(),phone:phone.trim(),role:role.trim().toLowerCase()});
+const p=data.find(x=>String(x.id)===String(id));
+if(!p)return;
+
+const name=prompt("User full name:",p.full_name||"");
+if(name===null)return;
+const phone=prompt("User phone:",p.phone||"");
+if(phone===null)return;
+const role=prompt("User role (student or admin):",p.role||"student");
+if(role===null)return;
+
+if(!["student","admin"].includes(role.trim().toLowerCase())){
+alert("Role must be student or admin.");
+return;
 }
+if(String(p.id)===String(user.id)&&role.trim().toLowerCase()!=="admin"){
+alert("You cannot remove your own admin role.");
+return;
+}
+
+updateUser(p.id,{
+full_name:name.trim(),
+phone:phone.trim(),
+role:role.trim().toLowerCase()
+});
+}
+
 async function updateUser(id,data){
 const {error}=await db.from("profiles").update(data).eq("id",id);
 if(error){alert(error.message);return;}
 await logAction("Updated user profile",data.full_name+" — role: "+data.role);
 await loadUsers();
 }
+
 $("refresh-users").onclick=loadUsers;
 $("user-search").oninput=loadUsers;
 
 async function loadAttendance(){
 $("attendance-table").innerHTML='<tr><td colspan="5">Loading attendance...</td></tr>';
-const {data,error}=await db.from("attendance").select("id,student_id,course_id,attended_at,status,profiles(full_name),courses(title)").order("attended_at",{ascending:false});
-if(error){$("attendance-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;msg("attendance-message",error.message,true);return;}
+
+const {data,error}=await db.from("attendance")
+.select("id,student_id,course_id,attended_at,status,profiles(full_name),courses(title)")
+.order("attended_at",{ascending:false});
+
+if(error){
+$("attendance-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;
+msg("attendance-message",error.message,true);
+return;
+}
+
 const rows=data||[];
 const grouped={};
+
 rows.forEach(a=>{
 const key=a.student_id+"_"+a.course_id;
-if(!grouped[key])grouped[key]={student:a.profiles?.full_name||"Unknown student",course:a.courses?.title||"Unknown course",count:0,last:a.attended_at,status:a.status};
+if(!grouped[key]){
+grouped[key]={
+student:a.profiles?.full_name||"Unknown student",
+course:a.courses?.title||"Unknown course",
+count:0,
+last:a.attended_at,
+status:a.status
+};
+}
 grouped[key].count++;
-if(new Date(a.attended_at)>new Date(grouped[key].last)){grouped[key].last=a.attended_at;grouped[key].status=a.status;}
+if(new Date(a.attended_at)>new Date(grouped[key].last)){
+grouped[key].last=a.attended_at;
+grouped[key].status=a.status;
+}
 });
+
 const q=$("attendance-search").value.toLowerCase().trim();
-const list=Object.values(grouped).filter(x=>x.student.toLowerCase().includes(q)||x.course.toLowerCase().includes(q));
-$("attendance-table").innerHTML=list.map(a=>`<tr><td>${esc(a.student)}</td><td>${esc(a.course)}</td><td>${a.count}</td><td>${esc(date(a.last))}</td><td>${esc(a.status||"-")}</td></tr>`).join("")||'<tr><td colspan="5">No attendance records found.</td></tr>';
+const list=Object.values(grouped).filter(x=>
+x.student.toLowerCase().includes(q)||
+x.course.toLowerCase().includes(q)
+);
+
+$("attendance-table").innerHTML=list.map(a=>`
+<tr>
+<td>${esc(a.student)}</td>
+<td>${esc(a.course)}</td>
+<td>${a.count}</td>
+<td>${esc(date(a.last))}</td>
+<td>${esc(a.status||"-")}</td>
+</tr>`).join("")||'<tr><td colspan="5">No attendance records found.</td></tr>';
+
 msg("attendance-message","Showing "+list.length+" student/course attendance summaries.");
 }
+
 $("refresh-attendance").onclick=loadAttendance;
 $("attendance-search").oninput=loadAttendance;
 
-function getYouTubeId(value){
-try{
-const u=new URL(value.trim());const host=u.hostname.replace(/^www\./,"");let id="";
-if(host==="youtu.be")id=u.pathname.split("/").filter(Boolean)[0]||"";
-else if(["youtube.com","m.youtube.com","youtube-nocookie.com"].includes(host)){
-if(u.pathname==="/watch")id=u.searchParams.get("v")||"";
-else{const p=u.pathname.split("/").filter(Boolean);if(p.length>1&&["embed","shorts","live"].includes(p[0]))id=p[1];}
-}
-return /^[a-zA-Z0-9_-]{11}$/.test(id)?id:null;
-}catch{return null;}
-}
 $("preview-video").onclick=()=>{
 const id=getYouTubeId($("video-url").value);
-if(!id){msg("video-message","Enter a valid YouTube URL.",true);return;}
+if(!id){
+msg("video-message","Enter a valid YouTube URL.",true);
+return;
+}
 $("video-preview").src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id);
-$("video-preview-container").hidden=false;msg("video-message","Video preview ready.");
+$("video-preview-container").hidden=false;
+msg("video-message","Video preview ready.");
 };
-$("video-url").addEventListener("input",()=>{$("video-preview-container").hidden=true;$("video-preview").src="";});
+
+$("video-url").addEventListener("input",()=>{
+$("video-preview-container").hidden=true;
+$("video-preview").src="";
+});
+
 $("video-form").addEventListener("submit",async e=>{
-e.preventDefault();setBusy("save-video",true);
-const title=$("video-title").value.trim(),description=$("video-description").value.trim(),course_id=$("video-course").value,youtube_url=$("video-url").value.trim(),id=getYouTubeId(youtube_url);
+e.preventDefault();
+setBusy("save-video",true);
+
+const title=$("video-title").value.trim();
+const description=$("video-description").value.trim();
+const service_id=$("video-service").value;
+const youtube_url=$("video-url").value.trim();
+const youtubeId=getYouTubeId(youtube_url);
+
 try{
-if(!id)throw Error("Enter a valid YouTube URL.");
-if(!course_id)throw Error("Select a course for this video.");
-const thumbnail_url="https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
-const {error}=await db.from("menyarwanda_videos").insert({title,description,course_id,youtube_url,thumbnail_url,published:true});
+if(!title)throw Error("Enter the video title.");
+if(!youtubeId)throw Error("Enter a valid YouTube URL.");
+if(!service_id)throw Error("Select a Digital Service.");
+
+const selectedService=services.find(s=>String(s.id)===String(service_id));
+if(!selectedService)throw Error("Selected service was not found. Refresh and try again.");
+
+const thumbnail_url="https://img.youtube.com/vi/"+youtubeId+"/hqdefault.jpg";
+
+const {error}=await db.from("menyarwanda_videos").insert({
+title,
+description,
+service_id,
+youtube_url,
+thumbnail_url,
+published:true
+});
+
 if(error)throw error;
-await logAction("Added learning video",title+" → "+($("video-course").selectedOptions[0]?.textContent||"Course"));
-$("video-form").reset();$("video-preview").src="";$("video-preview-container").hidden=true;
-msg("video-message","Video added to its course successfully. It will appear in Courses, not in this VideoHub page.");
+
+await logAction("Added learning video",title+" → "+selectedService.name);
+
+$("video-form").reset();
+$("video-preview").src="";
+$("video-preview-container").hidden=true;
+
+msg("video-message","Video successfully added to Courses under "+selectedService.name+".");
+
 await loadStats();
-}catch(err){msg("video-message",err.message,true);}
-finally{setBusy("save-video",false);}
+
+}catch(err){
+msg("video-message",err.message,true);
+}finally{
+setBusy("save-video",false);
+}
 });
 
 let reportCache=[];
+
 async function loadReports(){
 $("reports-table").innerHTML='<tr><td colspan="4">Loading reports...</td></tr>';
-const {data,error}=await db.from("admin_activity_logs").select("id,action,details,admin_id,created_at").order("created_at",{ascending:false}).limit(500);
-if(error){$("reports-table").innerHTML=`<tr><td colspan="4">${esc(error.message)}</td></tr>`;msg("reports-message",error.message,true);return;}
+
+const {data,error}=await db.from("admin_activity_logs")
+.select("id,action,details,admin_id,created_at")
+.order("created_at",{ascending:false})
+.limit(500);
+
+if(error){
+$("reports-table").innerHTML=`<tr><td colspan="4">${esc(error.message)}</td></tr>`;
+msg("reports-message",error.message,true);
+return;
+}
+
 reportCache=data||[];
 const ids=[...new Set(reportCache.map(x=>x.admin_id).filter(Boolean))];
 let names={};
-if(ids.length){const r=await db.from("profiles").select("id,full_name").in("id",ids);if(!r.error)(r.data||[]).forEach(p=>names[p.id]=p.full_name);}
-$("reports-table").innerHTML=reportCache.map(r=>`<tr><td>${esc(r.action)}</td><td>${esc(r.details||"-")}</td><td>${esc(names[r.admin_id]||"Administrator")}</td><td>${esc(date(r.created_at))}</td></tr>`).join("")||'<tr><td colspan="4">No activity recorded yet.</td></tr>';
+
+if(ids.length){
+const r=await db.from("profiles").select("id,full_name").in("id",ids);
+if(!r.error)(r.data||[]).forEach(p=>names[p.id]=p.full_name);
+}
+
+$("reports-table").innerHTML=reportCache.map(r=>{
+const details=typeof r.details==="object"
+?(r.details?.description||JSON.stringify(r.details))
+:(r.details||"-");
+
+return `<tr>
+<td>${esc(r.action)}</td>
+<td>${esc(details)}</td>
+<td>${esc(names[r.admin_id]||"Administrator")}</td>
+<td>${esc(date(r.created_at))}</td>
+</tr>`;
+}).join("")||'<tr><td colspan="4">No activity recorded yet.</td></tr>';
+
 msg("reports-message","Showing "+reportCache.length+" recent activity records.");
 }
+
 $("refresh-reports").onclick=loadReports;
+
 $("export-reports").onclick=()=>{
-if(!reportCache.length){alert("There are no reports to export.");return;}
+if(!reportCache.length){
+alert("There are no reports to export.");
+return;
+}
+
 const fields=["action","details","admin_id","created_at"];
-const csv=[fields.join(","),...reportCache.map(r=>fields.map(k=>'"'+String(r[k]??"").replace(/"/g,'""')+'"').join(","))].join("\n");
+const csv=[
+fields.join(","),
+...reportCache.map(r=>fields.map(k=>{
+const value=typeof r[k]==="object"?JSON.stringify(r[k]):r[k]??"";
+return '"'+String(value).replace(/"/g,'""')+'"';
+}).join(","))
+].join("\n");
+
 const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
-const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="menyarwanda-admin-reports.csv";a.click();URL.revokeObjectURL(url);
+const url=URL.createObjectURL(blob);
+const a=document.createElement("a");
+a.href=url;
+a.download="menyarwanda-admin-reports.csv";
+a.click();
+URL.revokeObjectURL(url);
 };
 
 await loadStats();
