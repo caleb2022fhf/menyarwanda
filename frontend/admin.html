@@ -7,7 +7,6 @@
 <meta name="theme-color" content="#080d18">
 <title>MENYARWANDA - Admin Dashboard</title>
 <link rel="stylesheet" href="css/style.css">
-
 <style>
 *{box-sizing:border-box}
 body{background:#080d18;color:#fff;margin:0;font-family:Arial,sans-serif}
@@ -31,7 +30,7 @@ body{background:#080d18;color:#fff;margin:0;font-family:Arial,sans-serif}
 .page-heading h1{font-size:26px;margin-bottom:8px}
 .muted{color:#91a0b5;line-height:1.6}
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px;margin:25px 0}
-.stat-card{background:#111b2d;border:1px solid #26364e;padding:22px;border-radius:12px}
+.stat-card,.panel-placeholder{background:#111b2d;border:1px solid #26364e;padding:22px;border-radius:12px}
 .stat-card p{color:#91a0b5;font-size:13px}
 .stat-card h2{color:#00c8ff;font-size:28px;margin:12px 0 0}
 .module-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
@@ -41,41 +40,37 @@ body{background:#080d18;color:#fff;margin:0;font-family:Arial,sans-serif}
 .module-card h3,.panel-placeholder h3{color:#00c8ff;margin-bottom:10px}
 .module-card p{color:#91a0b5;font-size:13px;line-height:1.6}
 .back-button{background:#19263a;color:white;border:1px solid #34445d;border-radius:7px;padding:9px 14px;cursor:pointer;margin-bottom:20px}
-.panel-placeholder{background:#111b2d;border:1px solid #26364e;border-radius:12px;padding:25px;margin-top:20px}
 .mobile-menu{display:none;background:#19263a;border:1px solid #34445d;color:white;padding:9px 12px;border-radius:7px;cursor:pointer}
 #admin-message{margin-bottom:15px}
-.video-form label,.service-form label{display:block;color:#aab7c8;margin:16px 0 7px;font-size:14px}
-.video-form input,.video-form textarea,.service-form input,.service-form textarea,.service-form select{
-width:100%;padding:13px;background:#080d18;color:white;border:1px solid #34445d;border-radius:7px;outline:none;font:inherit
-}
-.video-form input:focus,.video-form textarea:focus,.service-form input:focus,.service-form textarea:focus,.service-form select:focus{border-color:#00c8ff}
-.video-form textarea,.service-form textarea{resize:vertical}
-.video-action{border:0;border-radius:7px;padding:11px 17px;cursor:pointer;font-weight:bold;margin:8px 5px 0 0}
-.video-primary{background:#00c8ff;color:#080d18}
-.video-secondary{background:#26364e;color:white}
-.video-danger{background:#e63946;color:white}
-.video-success{background:#168653;color:white}
-.video-action:disabled{opacity:.5;cursor:not-allowed}
-.video-preview{display:none;margin-top:20px}
-.video-frame{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000}
+label{display:block;color:#aab7c8;margin:15px 0 7px;font-size:14px}
+input,textarea,select{width:100%;padding:12px;background:#080d18;color:white;border:1px solid #34445d;border-radius:7px;outline:none;font:inherit}
+input:focus,textarea:focus,select:focus{border-color:#00c8ff}
+textarea{resize:vertical}
+.action{border:0;border-radius:7px;padding:10px 15px;cursor:pointer;font-weight:bold;margin:7px 5px 0 0}
+.primary{background:#00c8ff;color:#080d18}
+.secondary{background:#26364e;color:white}
+.danger{background:#e63946;color:white}
+.success{background:#168653;color:white}
+.action:disabled{opacity:.5;cursor:not-allowed}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
+.toolbar input{max-width:350px}
+.data-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:15px;margin-top:18px}
+.data-card{background:#080d18;border:1px solid #26364e;border-radius:10px;padding:16px;min-width:0}
+.data-card h4{color:#00c8ff;margin:0 0 10px;overflow-wrap:anywhere}
+.data-card p{color:#91a0b5;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.data-card img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:7px;margin-bottom:10px}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;margin:5px 0 10px}
+.active-status{background:#12432f;color:#62e6a3}
+.inactive-status{background:#49391a;color:#ffd36a}
+.message{margin-top:12px;min-height:20px;color:#91a0b5;font-size:13px}
+.table-wrap{overflow-x:auto;margin-top:15px}
+table{width:100%;border-collapse:collapse;min-width:650px;background:#080d18}
+th,td{padding:12px;text-align:left;border-bottom:1px solid #26364e;font-size:13px}
+th{color:#00c8ff;background:#111b2d}
+td{color:#d5deea}
+.empty{color:#91a0b5;padding:15px 0}
+.video-frame{position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:10px;background:#000;margin-top:15px}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.video-list,.service-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:20px}
-.video-item,.service-item{background:#080d18;border:1px solid #26364e;border-radius:10px;overflow:hidden}
-.video-item img,.service-item img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
-.video-item-content,.service-item-content{padding:15px}
-.video-item h4,.service-item h4{color:#00c8ff;margin:0 0 9px;overflow-wrap:anywhere}
-.video-item p,.service-item p{color:#91a0b5;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
-.video-status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;margin:5px 0 10px}
-.video-status.published,.service-status.active{background:#12432f;color:#62e6a3}
-.video-status.unpublished,.service-status.inactive{background:#49391a;color:#ffd36a}
-.video-message{margin-top:12px;min-height:20px;font-size:13px;color:#91a0b5}
-.video-item-actions{display:flex;flex-wrap:wrap;gap:6px}
-.video-item-actions button{font-size:12px;padding:8px 10px;margin:0}
-.service-status{display:inline-block;padding:5px 9px;border-radius:20px;font-size:11px;margin:5px 0 10px}
-.service-price{color:#62e6a3;font-weight:bold;margin:8px 0}
-.service-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:15px}
-.service-toolbar input{max-width:350px}
-.empty-message{color:#91a0b5;padding:15px 0}
 @media(max-width:850px){
 .sidebar{transform:translateX(-100%);transition:.25s}
 .sidebar.open{transform:translateX(0)}
@@ -86,837 +81,494 @@ width:100%;padding:13px;background:#080d18;color:white;border:1px solid #34445d;
 }
 </style>
 </head>
-
 <body>
 <div class="admin-layout">
-
 <aside class="sidebar" id="sidebar">
-    <div class="brand">MENYARWANDA</div>
-    <div class="sidebar-label">MAIN MENU</div>
-
-    <button class="nav-button active" data-page="overview"><span>▦</span> Overview</button>
-    <button class="nav-button" data-page="users"><span>♙</span> Users Management</button>
-    <button class="nav-button" data-page="courses"><span>▤</span> Courses</button>
-    <button class="nav-button" data-page="attendance"><span>◷</span> Attendance</button>
-    <button class="nav-button" data-page="payments"><span>▣</span> Payments</button>
-
-    <div class="sidebar-label">PLATFORM SERVICES</div>
-    <button class="nav-button" data-page="digital"><span>◇</span> Digital Services</button>
-    <button class="nav-button" data-page="videohub"><span>▷</span> VideoHub</button>
-    <button class="nav-button" data-page="ai"><span>✧</span> MENYA AI</button>
-
-    <div class="sidebar-label">ANALYTICS</div>
-    <button class="nav-button" data-page="reports"><span>▥</span> Reports</button>
+<div class="brand">MENYARWANDA</div>
+<div class="sidebar-label">MAIN MENU</div>
+<button class="nav-button active" data-page="overview"><span>▦</span>Overview</button>
+<button class="nav-button" data-page="users"><span>♙</span>Users Management</button>
+<button class="nav-button" data-page="courses"><span>▤</span>Courses</button>
+<button class="nav-button" data-page="attendance"><span>◷</span>Attendance</button>
+<div class="sidebar-label">PLATFORM SERVICES</div>
+<button class="nav-button" data-page="digital"><span>◇</span>Digital Services</button>
+<button class="nav-button" data-page="videohub"><span>▷</span>VideoHub</button>
+<div class="sidebar-label">ANALYTICS</div>
+<button class="nav-button" data-page="reports"><span>▥</span>Reports</button>
 </aside>
 
 <div class="main-area">
 <header class="topbar">
-    <div style="display:flex;align-items:center;gap:14px">
-        <button class="mobile-menu" id="mobile-menu">☰</button>
-        <h2 id="current-page-title">Dashboard Overview</h2>
-    </div>
-    <div class="admin-info">
-        <span class="admin-status">ADMIN</span>
-        <strong id="admin-name">Administrator</strong>
-        <button id="logout-button" class="logout-btn">Logout</button>
-    </div>
+<div style="display:flex;align-items:center;gap:14px">
+<button class="mobile-menu" id="mobile-menu">☰</button>
+<h2 id="current-page-title">Dashboard Overview</h2>
+</div>
+<div class="admin-info">
+<span class="admin-status">ADMIN</span>
+<strong id="admin-name">Administrator</strong>
+<button id="logout-button" class="logout-btn">Logout</button>
+</div>
 </header>
 
 <main class="content">
 <p id="admin-message" class="muted">Checking administrator access...</p>
 
-<!-- OVERVIEW -->
 <section class="page-section active" id="page-overview">
-    <div class="page-heading">
-        <h1>Dashboard Overview</h1>
-        <p class="muted">Welcome back, <strong id="welcome-name">Administrator</strong>. Manage your MENYARWANDA platform.</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card"><p>Total Users</p><h2 id="total-users">Loading...</h2></div>
-        <div class="stat-card"><p>Total Courses</p><h2 id="total-courses">Loading...</h2></div>
-        <div class="stat-card"><p>Attendance Records</p><h2 id="total-attendance">Loading...</h2></div>
-        <div class="stat-card"><p>Total Payments</p><h2 id="total-payments">Loading...</h2></div>
-    </div>
-
-    <h2 class="section-title">Platform Management</h2>
-    <div class="module-grid">
-        <div class="module-card" data-open="users"><div class="module-icon">♙</div><h3>Users Management</h3><p>View and manage registered users and students.</p></div>
-        <div class="module-card" data-open="courses"><div class="module-icon">▤</div><h3>Courses</h3><p>Create, edit and manage learning courses.</p></div>
-        <div class="module-card" data-open="attendance"><div class="module-icon">◷</div><h3>Attendance</h3><p>Monitor student attendance records.</p></div>
-        <div class="module-card" data-open="payments"><div class="module-icon">▣</div><h3>Payments</h3><p>Monitor payments and transaction records.</p></div>
-        <div class="module-card" data-open="digital"><div class="module-icon">◇</div><h3>Digital Services</h3><p>Manage services and their availability.</p></div>
-        <div class="module-card" data-open="videohub"><div class="module-icon">▷</div><h3>VideoHub</h3><p>Add, edit, publish and manage YouTube videos.</p></div>
-        <div class="module-card" data-open="ai"><div class="module-icon">✧</div><h3>MENYA AI</h3><p>Manage the AI assistant and its settings.</p></div>
-        <div class="module-card" data-open="reports"><div class="module-icon">▥</div><h3>Reports</h3><p>View platform statistics and reports.</p></div>
-    </div>
+<div class="page-heading">
+<h1>Dashboard Overview</h1>
+<p class="muted">Welcome back, <strong id="welcome-name">Administrator</strong>. Manage your MENYARWANDA platform.</p>
+</div>
+<div class="stats-grid">
+<div class="stat-card"><p>Total Users</p><h2 id="total-users">...</h2></div>
+<div class="stat-card"><p>Total Courses</p><h2 id="total-courses">...</h2></div>
+<div class="stat-card"><p>Attendance Records</p><h2 id="total-attendance">...</h2></div>
+<div class="stat-card"><p>Digital Services</p><h2 id="total-services">...</h2></div>
+<div class="stat-card"><p>Learning Videos</p><h2 id="total-videos">...</h2></div>
+</div>
+<h2>Platform Management</h2>
+<div class="module-grid">
+<div class="module-card" data-open="users"><div class="module-icon">♙</div><h3>Users Management</h3><p>View and manage registered users.</p></div>
+<div class="module-card" data-open="courses"><div class="module-icon">▤</div><h3>Courses</h3><p>View courses and their videos grouped by service.</p></div>
+<div class="module-card" data-open="attendance"><div class="module-icon">◷</div><h3>Attendance</h3><p>Monitor how many times each student has studied.</p></div>
+<div class="module-card" data-open="digital"><div class="module-icon">◇</div><h3>Digital Services</h3><p>Create services and courses under each service.</p></div>
+<div class="module-card" data-open="videohub"><div class="module-icon">▷</div><h3>VideoHub</h3><p>Add YouTube videos to courses.</p></div>
+<div class="module-card" data-open="reports"><div class="module-icon">▥</div><h3>Reports</h3><p>View recorded platform activities.</p></div>
+</div>
 </section>
 
-<!-- USERS -->
 <section class="page-section" id="page-users">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>Users Management</h1><p class="muted">Manage registered users and students.</p></div>
-    <div class="panel-placeholder">
-        <h3>Registered Users</h3>
-        <p class="muted">This module will be connected after confirming the user-management permissions and required actions.</p>
-    </div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>Users Management</h1><p class="muted">View and manage registered profiles and their roles.</p></div>
+<div class="panel-placeholder">
+<div class="toolbar"><input id="user-search" placeholder="Search name or phone"><button class="action secondary" id="refresh-users">Refresh</button></div>
+<div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead><tbody id="users-table"></tbody></table></div>
+<p id="users-message" class="message"></p>
+</div>
 </section>
 
-<!-- COURSES -->
 <section class="page-section" id="page-courses">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>Courses Management</h1><p class="muted">Manage learning courses.</p></div>
-    <div class="panel-placeholder"><h3>Courses</h3><p class="muted">Course management will be connected to your existing courses table.</p></div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>Courses Management</h1><p class="muted">Courses and learning videos grouped by Digital Service.</p></div>
+<div class="panel-placeholder">
+<h3 id="course-form-heading">Add Course</h3>
+<form id="course-form">
+<label>Course title</label><input id="course-title" maxlength="200" required>
+<label>Description</label><textarea id="course-description" rows="3"></textarea>
+<label>Digital Service</label><select id="course-service" required><option value="">Select service</option></select>
+<label>Image URL (optional)</label><input id="course-image" type="url">
+<label>Status</label><select id="course-active"><option value="true">Active</option><option value="false">Inactive</option></select>
+<button class="action primary" id="save-course">Add Course</button>
+<button class="action secondary" type="button" id="cancel-course" hidden>Cancel</button>
+<p id="course-message" class="message"></p>
+</form>
+</div>
+<div class="panel-placeholder" style="margin-top:20px">
+<div class="toolbar"><input id="course-search" placeholder="Search courses"><button class="action secondary" id="refresh-courses">Refresh</button></div>
+<div id="course-list" class="data-list"></div>
+</div>
 </section>
 
-<!-- ATTENDANCE -->
 <section class="page-section" id="page-attendance">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>Attendance Management</h1><p class="muted">Monitor student attendance.</p></div>
-    <div class="panel-placeholder"><h3>Attendance Records</h3><p class="muted">Attendance management will be connected to your existing attendance table.</p></div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>Attendance Management</h1><p class="muted">See how many learning sessions each student has completed or attended.</p></div>
+<div class="panel-placeholder">
+<div class="toolbar"><input id="attendance-search" placeholder="Search student"><button class="action secondary" id="refresh-attendance">Refresh</button></div>
+<div class="table-wrap"><table><thead><tr><th>Student</th><th>Course</th><th>Times Studied</th><th>Last Attendance</th><th>Status</th></tr></thead><tbody id="attendance-table"></tbody></table></div>
+<p id="attendance-message" class="message"></p>
+</div>
 </section>
 
-<!-- PAYMENTS -->
-<section class="page-section" id="page-payments">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>Payments Management</h1><p class="muted">Monitor student payments.</p></div>
-    <div class="panel-placeholder"><h3>Payment Records</h3><p class="muted">Payment management will be connected to your existing payments table.</p></div>
-</section>
-
-<!-- DIGITAL SERVICES -->
 <section class="page-section" id="page-digital">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading">
-        <h1>Digital Services Management</h1>
-        <p class="muted">Add, edit, activate, deactivate and delete digital services.</p>
-    </div>
-
-    <div class="panel-placeholder">
-        <h3 id="service-form-heading">Add New Digital Service</h3>
-
-        <form id="service-form" class="service-form">
-            <label for="service-name">Service Name</label>
-            <input id="service-name" type="text" maxlength="150" placeholder="e.g. Website Development" required>
-
-            <label for="service-description">Description</label>
-            <textarea id="service-description" rows="4" maxlength="5000" placeholder="Describe this service"></textarea>
-
-            <label for="service-category">Category</label>
-            <input id="service-category" type="text" maxlength="100" placeholder="e.g. Technology, Education, Design">
-
-            <label for="service-price">Price (RWF)</label>
-            <input id="service-price" type="number" min="0" step="0.01" value="0" required>
-
-            <label for="service-image">Image URL (optional)</label>
-            <input id="service-image" type="url" placeholder="https://example.com/image.jpg">
-
-            <label for="service-active">Service Status</label>
-            <select id="service-active">
-                <option value="true">Active - visible to visitors</option>
-                <option value="false">Inactive - hidden from visitors</option>
-            </select>
-
-            <button type="submit" class="video-action video-primary" id="save-service-button">Add Service</button>
-            <button type="button" class="video-action video-secondary" id="cancel-service-edit" style="display:none">Cancel Edit</button>
-            <p id="service-form-message" class="video-message"></p>
-        </form>
-    </div>
-
-    <div class="panel-placeholder">
-        <h3>All Digital Services</h3>
-        <div class="service-toolbar">
-            <input id="service-search" type="search" placeholder="Search services...">
-            <button type="button" class="video-action video-secondary" id="refresh-services-button">Refresh Services</button>
-        </div>
-        <div id="digital-service-list" class="service-list">
-            <p class="empty-message">Services will load here.</p>
-        </div>
-    </div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>Digital Services</h1><p class="muted">Create and manage the services available on the platform.</p></div>
+<div class="panel-placeholder">
+<h3 id="service-form-heading">Add New Digital Service</h3>
+<form id="service-form">
+<label>Service Name</label><input id="service-name" maxlength="150" required>
+<label>Description</label><textarea id="service-description" rows="4"></textarea>
+<label>Category</label><input id="service-category" maxlength="100">
+<label>Price (RWF)</label><input id="service-price" type="number" min="0" step="0.01" value="0" required>
+<label>Image URL</label><input id="service-image" type="url">
+<label>Status</label><select id="service-active"><option value="true">Active</option><option value="false">Inactive</option></select>
+<button class="action primary" id="save-service">Add Service</button>
+<button class="action secondary" id="cancel-service" type="button" hidden>Cancel</button>
+<p id="service-message" class="message"></p>
+</form>
+</div>
+<div class="panel-placeholder" style="margin-top:20px">
+<div class="toolbar"><input id="service-search" placeholder="Search services"><button class="action secondary" id="refresh-services">Refresh</button></div>
+<div id="service-list" class="data-list"></div>
+</div>
 </section>
 
-<!-- VIDEOHUB -->
 <section class="page-section" id="page-videohub">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading">
-        <h1>MENYARWANDA Video Management</h1>
-        <p class="muted">Add and manage YouTube videos for MENYARWANDA. These videos are separate from the public VideoHub website.</p>
-    </div>
-
-    <div class="panel-placeholder">
-        <h3>Add New Video</h3>
-        <form id="menyarwanda-video-form" class="video-form">
-            <label for="video-title">Video Title</label>
-            <input type="text" id="video-title" maxlength="200" placeholder="Enter video title" required>
-
-            <label for="video-description">Description</label>
-            <textarea id="video-description" rows="4" maxlength="5000" placeholder="Enter video description"></textarea>
-
-            <label for="video-url">YouTube URL</label>
-            <input type="url" id="video-url" placeholder="https://www.youtube.com/watch?v=..." required>
-
-            <div class="video-preview" id="video-preview-container">
-                <h3>Video Preview</h3>
-                <div class="video-frame">
-                    <iframe id="video-preview" src="" title="YouTube video preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-                </div>
-            </div>
-
-            <button type="button" class="video-action video-secondary" id="preview-video-btn">Preview</button>
-            <button type="submit" class="video-action video-primary" id="publish-video-btn">Publish Video</button>
-            <button type="button" class="video-action video-secondary" id="cancel-edit-btn" style="display:none">Cancel Edit</button>
-            <p id="video-form-message" class="video-message"></p>
-        </form>
-    </div>
-
-    <div class="panel-placeholder">
-        <h3>MENYARWANDA Videos</h3>
-        <p class="muted">Videos managed here are stored separately from public VideoHub.</p>
-        <button type="button" class="video-action video-secondary" id="refresh-videos-btn">Refresh Videos</button>
-        <div id="menyarwanda-video-list" class="video-list"><p class="muted">Videos will load here.</p></div>
-    </div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>VideoHub - Video Upload Tool</h1><p class="muted">Add YouTube videos to courses. Videos are displayed in Courses, not in this VideoHub page.</p></div>
+<div class="panel-placeholder">
+<form id="video-form">
+<label>Video title</label><input id="video-title" maxlength="200" required>
+<label>Description</label><textarea id="video-description" rows="3"></textarea>
+<label>Choose Digital Service and Course</label><select id="video-course" required><option value="">Select course</option></select>
+<label>YouTube URL</label><input id="video-url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
+<div id="video-preview-container" hidden><h3>Preview</h3><div class="video-frame"><iframe id="video-preview" title="Video preview" allowfullscreen></iframe></div></div>
+<button type="button" class="action secondary" id="preview-video">Preview</button>
+<button class="action primary" id="save-video">Add Video to Course</button>
+<p id="video-message" class="message"></p>
+</form>
+</div>
 </section>
 
-<!-- AI -->
-<section class="page-section" id="page-ai">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>MENYA AI Management</h1><p class="muted">Manage the AI assistant.</p></div>
-    <div class="panel-placeholder"><h3>AI Assistant</h3><p class="muted">AI management settings will be added after confirming which settings you want administrators to control.</p></div>
-</section>
-
-<!-- REPORTS -->
 <section class="page-section" id="page-reports">
-    <button class="back-button" data-back>← Overview</button>
-    <div class="page-heading"><h1>Platform Reports</h1><p class="muted">Review platform activity and statistics.</p></div>
-    <div class="panel-placeholder"><h3>Reports</h3><p class="muted">Detailed reports will be connected after confirming the database fields and report requirements.</p></div>
+<button class="back-button" data-back>← Overview</button>
+<div class="page-heading"><h1>Platform Reports</h1><p class="muted">A record of actions performed on the platform through this admin dashboard.</p></div>
+<div class="panel-placeholder">
+<div class="toolbar"><button class="action secondary" id="refresh-reports">Refresh Reports</button><button class="action primary" id="export-reports">Export CSV</button></div>
+<div class="table-wrap"><table><thead><tr><th>Action</th><th>Details</th><th>Admin</th><th>Date</th></tr></thead><tbody id="reports-table"></tbody></table></div>
+<p id="reports-message" class="message"></p>
+</div>
 </section>
-
 </main>
 </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/supabase.js"></script>
-
 <script>
 "use strict";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const db = window.MENYARWANDA_DB;
-    const message = document.getElementById("admin-message");
-    const logoutButton = document.getElementById("logout-button");
-
-    if (!db) {
-        message.textContent = "Database connection unavailable. Check js/supabase.js.";
-        return;
-    }
-
-    const { data: sessionData, error: sessionError } = await db.auth.getSession();
-
-    if (sessionError || !sessionData.session) {
-        window.location.replace("login.html");
-        return;
-    }
-
-    const user = sessionData.session.user;
-
-    const { data: profile, error } = await db
-        .from("profiles")
-        .select("full_name, role")
-        .eq("id", user.id)
-        .single();
-
-    if (error || !profile || profile.role !== "admin") {
-        await db.auth.signOut();
-        window.location.replace("login.html");
-        return;
-    }
-
-    const adminName = profile.full_name || "Administrator";
-    document.getElementById("admin-name").textContent = adminName;
-    document.getElementById("welcome-name").textContent = adminName;
-    message.textContent = "Administrator access verified.";
-
-    function escapeHTML(value) {
-        return String(value ?? "").replace(/[&<>"']/g, character => ({
-            "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-        })[character]);
-    }
-
-    // DASHBOARD STATISTICS
-    async function loadDashboardStatistics() {
-        const statistics = [
-            {table:"profiles",element:"total-users"},
-            {table:"courses",element:"total-courses"},
-            {table:"attendance",element:"total-attendance"},
-            {table:"payments",element:"total-payments"}
-        ];
-
-        for (const item of statistics) {
-            const display = document.getElementById(item.element);
-            try {
-                const {count,error} = await db.from(item.table).select("*",{count:"exact",head:true});
-                if (error) {
-                    console.error("Failed to count "+item.table,error);
-                    display.textContent = "Error";
-                } else {
-                    display.textContent = (count ?? 0).toLocaleString();
-                }
-            } catch (err) {
-                console.error(err);
-                display.textContent = "Error";
-            }
-        }
-    }
-
-    await loadDashboardStatistics();
-
-    // PAGE NAVIGATION
-    const sections = document.querySelectorAll(".page-section");
-    const navButtons = document.querySelectorAll(".nav-button");
-    const title = document.getElementById("current-page-title");
-    const sidebar = document.getElementById("sidebar");
-
-    const pageTitles = {
-        overview:"Dashboard Overview",
-        users:"Users Management",
-        courses:"Courses Management",
-        attendance:"Attendance Management",
-        payments:"Payments Management",
-        digital:"Digital Services",
-        videohub:"MENYARWANDA Video Management",
-        ai:"MENYA AI Management",
-        reports:"Platform Reports"
-    };
-
-    function openPage(page) {
-        sections.forEach(section => section.classList.remove("active"));
-        const selected = document.getElementById("page-"+page);
-        if (!selected) return;
-
-        selected.classList.add("active");
-        navButtons.forEach(button => {
-            button.classList.toggle("active",button.dataset.page === page);
-        });
-
-        title.textContent = pageTitles[page] || "Dashboard";
-        sidebar.classList.remove("open");
-        window.scrollTo({top:0,behavior:"smooth"});
-
-        if (page === "videohub") loadMenyarwandaVideos();
-        if (page === "digital") loadDigitalServices();
-    }
-
-    navButtons.forEach(button => button.addEventListener("click",() => openPage(button.dataset.page)));
-    document.querySelectorAll("[data-open]").forEach(card => card.addEventListener("click",() => openPage(card.dataset.open)));
-    document.querySelectorAll("[data-back]").forEach(button => button.addEventListener("click",() => openPage("overview")));
-
-    document.getElementById("mobile-menu").addEventListener("click",() => sidebar.classList.toggle("open"));
-
-    logoutButton.addEventListener("click",async () => {
-        logoutButton.disabled = true;
-        await db.auth.signOut();
-        window.location.replace("login.html");
-    });
-
-    // ==========================================
-    // DIGITAL SERVICES MANAGEMENT
-    // ==========================================
-
-    const serviceForm = document.getElementById("service-form");
-    const serviceName = document.getElementById("service-name");
-    const serviceDescription = document.getElementById("service-description");
-    const serviceCategory = document.getElementById("service-category");
-    const servicePrice = document.getElementById("service-price");
-    const serviceImage = document.getElementById("service-image");
-    const serviceActive = document.getElementById("service-active");
-    const serviceList = document.getElementById("digital-service-list");
-    const serviceMessage = document.getElementById("service-form-message");
-    const saveServiceButton = document.getElementById("save-service-button");
-    const cancelServiceEdit = document.getElementById("cancel-service-edit");
-    const serviceSearch = document.getElementById("service-search");
-
-    let editingServiceId = null;
-    let cachedServices = [];
-
-    function showServiceMessage(text,isError=false) {
-        serviceMessage.textContent = text;
-        serviceMessage.style.color = isError ? "#ff7777" : "#91a0b5";
-    }
-
-    function resetServiceForm() {
-        serviceForm.reset();
-        servicePrice.value = "0";
-        serviceActive.value = "true";
-        editingServiceId = null;
-        saveServiceButton.textContent = "Add Service";
-        cancelServiceEdit.style.display = "none";
-        document.getElementById("service-form-heading").textContent = "Add New Digital Service";
-        showServiceMessage("");
-    }
-
-    async function loadDigitalServices() {
-        serviceList.innerHTML = '<p class="empty-message">Loading services...</p>';
-
-        const {data,error} = await db
-            .from("digital_services")
-            .select("*")
-            .order("created_at",{ascending:false});
-
-        if (error) {
-            console.error("Digital services loading error:",error);
-            serviceList.innerHTML = '<p class="empty-message">Could not load services: '+escapeHTML(error.message)+'</p>';
-            return;
-        }
-
-        cachedServices = data || [];
-        renderDigitalServices();
-    }
-
-    function renderDigitalServices() {
-        const search = serviceSearch.value.trim().toLowerCase();
-
-        const filtered = cachedServices.filter(service =>
-            String(service.name || "").toLowerCase().includes(search) ||
-            String(service.category || "").toLowerCase().includes(search) ||
-            String(service.description || "").toLowerCase().includes(search)
-        );
-
-        if (!filtered.length) {
-            serviceList.innerHTML = '<p class="empty-message">No matching services found.</p>';
-            return;
-        }
-
-        serviceList.innerHTML = "";
-
-        filtered.forEach(service => {
-            const item = document.createElement("article");
-            item.className = "service-item";
-
-            if (service.image_url) {
-                const image = document.createElement("img");
-                image.src = service.image_url;
-                image.alt = service.name || "Service image";
-                image.loading = "lazy";
-                image.onerror = () => image.style.display = "none";
-                item.appendChild(image);
-            }
-
-            const content = document.createElement("div");
-            content.className = "service-item-content";
-
-            const heading = document.createElement("h4");
-            heading.textContent = service.name;
-
-            const description = document.createElement("p");
-            description.textContent = service.description || "No description";
-
-            const category = document.createElement("p");
-            category.textContent = "Category: " + (service.category || "Uncategorized");
-
-            const price = document.createElement("p");
-            price.className = "service-price";
-            price.textContent = Number(service.price || 0).toLocaleString() + " " + (service.currency || "RWF");
-
-            const status = document.createElement("span");
-            status.className = "service-status " + (service.is_active ? "active" : "inactive");
-            status.textContent = service.is_active ? "Active" : "Inactive";
-
-            const actions = document.createElement("div");
-            actions.className = "video-item-actions";
-
-            const editButton = document.createElement("button");
-            editButton.className = "video-action video-secondary";
-            editButton.textContent = "Edit";
-            editButton.addEventListener("click",() => editService(service));
-
-            const toggleButton = document.createElement("button");
-            toggleButton.className = "video-action " + (service.is_active ? "video-secondary" : "video-success");
-            toggleButton.textContent = service.is_active ? "Deactivate" : "Activate";
-            toggleButton.addEventListener("click",() => toggleService(service));
-
-            const deleteButton = document.createElement("button");
-            deleteButton.className = "video-action video-danger";
-            deleteButton.textContent = "Delete";
-            deleteButton.addEventListener("click",() => deleteService(service));
-
-            actions.append(editButton,toggleButton,deleteButton);
-            content.append(heading,description,category,price,status,document.createElement("br"),actions);
-            item.appendChild(content);
-            serviceList.appendChild(item);
-        });
-    }
-
-    serviceForm.addEventListener("submit",async event => {
-        event.preventDefault();
-
-        const name = serviceName.value.trim();
-        const description = serviceDescription.value.trim();
-        const category = serviceCategory.value.trim();
-        const price = Number(servicePrice.value);
-        const imageUrl = serviceImage.value.trim();
-        const isActive = serviceActive.value === "true";
-
-        if (!name) {
-            showServiceMessage("Please enter the service name.",true);
-            return;
-        }
-
-        if (!Number.isFinite(price) || price < 0) {
-            showServiceMessage("Please enter a valid price.",true);
-            return;
-        }
-
-        if (imageUrl) {
-            try {
-                const parsed = new URL(imageUrl);
-                if (!["http:","https:"].includes(parsed.protocol)) throw new Error();
-            } catch {
-                showServiceMessage("Please enter a valid image URL.",true);
-                return;
-            }
-        }
-
-        const serviceData = {
-            name,
-            description,
-            category,
-            price,
-            currency:"RWF",
-            image_url:imageUrl || null,
-            is_active:isActive
-        };
-
-        saveServiceButton.disabled = true;
-        showServiceMessage(editingServiceId ? "Updating service..." : "Adding service...");
-
-        try {
-            let result;
-
-            if (editingServiceId) {
-                result = await db
-                    .from("digital_services")
-                    .update(serviceData)
-                    .eq("id",editingServiceId);
-            } else {
-                result = await db
-                    .from("digital_services")
-                    .insert(serviceData);
-            }
-
-            if (result.error) throw result.error;
-
-            showServiceMessage(editingServiceId ? "Service updated successfully." : "Service added successfully.");
-            resetServiceForm();
-            await loadDigitalServices();
-
-        } catch (err) {
-            console.error("Service save error:",err);
-            showServiceMessage(err.message || "Could not save service.",true);
-        } finally {
-            saveServiceButton.disabled = false;
-        }
-    });
-
-    function editService(service) {
-        editingServiceId = service.id;
-        serviceName.value = service.name || "";
-        serviceDescription.value = service.description || "";
-        serviceCategory.value = service.category || "";
-        servicePrice.value = service.price ?? 0;
-        serviceImage.value = service.image_url || "";
-        serviceActive.value = service.is_active ? "true" : "false";
-
-        saveServiceButton.textContent = "Save Changes";
-        cancelServiceEdit.style.display = "inline-block";
-        document.getElementById("service-form-heading").textContent = "Edit Digital Service";
-        showServiceMessage("Editing: " + service.name);
-
-        document.getElementById("page-digital").scrollIntoView({behavior:"smooth",block:"start"});
-    }
-
-    async function toggleService(service) {
-        const newStatus = !service.is_active;
-        const action = newStatus ? "activate" : "deactivate";
-
-        if (!confirm("Are you sure you want to "+action+" this service?")) return;
-
-        const {error} = await db
-            .from("digital_services")
-            .update({is_active:newStatus})
-            .eq("id",service.id);
-
-        if (error) {
-            alert("Could not update service: " + error.message);
-            return;
-        }
-
-        await loadDigitalServices();
-    }
-
-    async function deleteService(service) {
-        if (!confirm('Permanently delete "'+service.name+'"? This cannot be undone.')) return;
-
-        const {error} = await db
-            .from("digital_services")
-            .delete()
-            .eq("id",service.id);
-
-        if (error) {
-            alert("Could not delete service: " + error.message);
-            return;
-        }
-
-        await loadDigitalServices();
-    }
-
-    cancelServiceEdit.addEventListener("click",resetServiceForm);
-    document.getElementById("refresh-services-button").addEventListener("click",loadDigitalServices);
-    serviceSearch.addEventListener("input",renderDigitalServices);
-
-    // ==========================================
-    // MENYARWANDA VIDEO MANAGEMENT
-    // ==========================================
-
-    const videoForm = document.getElementById("menyarwanda-video-form");
-    const videoTitle = document.getElementById("video-title");
-    const videoDescription = document.getElementById("video-description");
-    const videoUrl = document.getElementById("video-url");
-    const previewButton = document.getElementById("preview-video-btn");
-    const publishButton = document.getElementById("publish-video-btn");
-    const cancelEditButton = document.getElementById("cancel-edit-btn");
-    const previewContainer = document.getElementById("video-preview-container");
-    const previewFrame = document.getElementById("video-preview");
-    const videoMessage = document.getElementById("video-form-message");
-    const videoList = document.getElementById("menyarwanda-video-list");
-    const refreshVideosButton = document.getElementById("refresh-videos-btn");
-
-    let editingVideoId = null;
-
-    function getYouTubeId(value) {
-        try {
-            const url = new URL(value.trim());
-            const host = url.hostname.replace(/^www\./,"");
-            let id = "";
-
-            if (host === "youtu.be") {
-                id = url.pathname.split("/").filter(Boolean)[0] || "";
-            } else if (["youtube.com","m.youtube.com","youtube-nocookie.com"].includes(host)) {
-                if (url.pathname === "/watch") {
-                    id = url.searchParams.get("v") || "";
-                } else {
-                    const parts = url.pathname.split("/").filter(Boolean);
-                    if (parts.length >= 2 && ["embed","shorts","live"].includes(parts[0])) id = parts[1];
-                }
-            }
-
-            return /^[a-zA-Z0-9_-]{11}$/.test(id) ? id : null;
-        } catch {
-            return null;
-        }
-    }
-
-    function showVideoMessage(text,isError=false) {
-        videoMessage.textContent = text;
-        videoMessage.style.color = isError ? "#ff7777" : "#91a0b5";
-    }
-
-    function resetVideoForm() {
-        videoForm.reset();
-        editingVideoId = null;
-        publishButton.textContent = "Publish Video";
-        cancelEditButton.style.display = "none";
-        previewContainer.style.display = "none";
-        previewFrame.src = "";
-        showVideoMessage("");
-    }
-
-    function previewVideo() {
-        const id = getYouTubeId(videoUrl.value);
-        if (!id) {
-            previewContainer.style.display = "none";
-            previewFrame.src = "";
-            showVideoMessage("Please enter a valid YouTube video URL.",true);
-            return;
-        }
-
-        previewFrame.src = "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(id);
-        previewContainer.style.display = "block";
-        showVideoMessage("Video preview is ready.");
-    }
-
-    previewButton.addEventListener("click",previewVideo);
-    videoUrl.addEventListener("input",() => {
-        previewContainer.style.display = "none";
-        previewFrame.src = "";
-    });
-
-    async function loadMenyarwandaVideos() {
-        videoList.innerHTML = '<p class="muted">Loading videos...</p>';
-
-        const {data,error} = await db
-            .from("menyarwanda_videos")
-            .select("*")
-            .order("created_at",{ascending:false});
-
-        if (error) {
-            console.error("Video loading error:",error);
-            videoList.innerHTML = '<p class="muted">Could not load videos: '+escapeHTML(error.message)+'</p>';
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            videoList.innerHTML = '<p class="muted">No videos have been added yet.</p>';
-            return;
-        }
-
-        videoList.innerHTML = "";
-
-        data.forEach(video => {
-            const item = document.createElement("article");
-            item.className = "video-item";
-
-            const videoId = getYouTubeId(video.youtube_url);
-            const thumbnail = video.thumbnail_url || (videoId ? "https://img.youtube.com/vi/"+videoId+"/hqdefault.jpg" : "");
-
-            const image = document.createElement("img");
-            image.src = thumbnail;
-            image.alt = video.title;
-            image.loading = "lazy";
-
-            const content = document.createElement("div");
-            content.className = "video-item-content";
-
-            const heading = document.createElement("h4");
-            heading.textContent = video.title;
-
-            const description = document.createElement("p");
-            description.textContent = video.description || "No description";
-
-            const status = document.createElement("span");
-            status.className = "video-status " + (video.published ? "published" : "unpublished");
-            status.textContent = video.published ? "Published" : "Unpublished";
-
-            const actions = document.createElement("div");
-            actions.className = "video-item-actions";
-
-            const editButton = document.createElement("button");
-            editButton.className = "video-action video-secondary";
-            editButton.textContent = "Edit";
-            editButton.addEventListener("click",() => editVideo(video));
-
-            const toggleButton = document.createElement("button");
-            toggleButton.className = "video-action " + (video.published ? "video-secondary" : "video-success");
-            toggleButton.textContent = video.published ? "Unpublish" : "Publish";
-            toggleButton.addEventListener("click",() => toggleVideoStatus(video));
-
-            const deleteButton = document.createElement("button");
-            deleteButton.className = "video-action video-danger";
-            deleteButton.textContent = "Delete";
-            deleteButton.addEventListener("click",() => deleteVideo(video));
-
-            actions.append(editButton,toggleButton,deleteButton);
-            content.append(heading,description,status,document.createElement("br"),actions);
-            item.append(image,content);
-            videoList.appendChild(item);
-        });
-    }
-
-    videoForm.addEventListener("submit",async event => {
-        event.preventDefault();
-
-        const title = videoTitle.value.trim();
-        const description = videoDescription.value.trim();
-        const youtubeUrl = videoUrl.value.trim();
-        const youtubeId = getYouTubeId(youtubeUrl);
-
-        if (!title) {
-            showVideoMessage("Video title is required.",true);
-            return;
-        }
-
-        if (!youtubeId) {
-            showVideoMessage("Please enter a valid YouTube URL.",true);
-            return;
-        }
-
-        const thumbnailUrl = "https://img.youtube.com/vi/"+youtubeId+"/hqdefault.jpg";
-        publishButton.disabled = true;
-        showVideoMessage(editingVideoId ? "Updating video..." : "Publishing video...");
-
-        try {
-            let result;
-
-            if (editingVideoId) {
-                result = await db.from("menyarwanda_videos")
-                    .update({title,description,youtube_url:youtubeUrl,thumbnail_url:thumbnailUrl})
-                    .eq("id",editingVideoId);
-            } else {
-                result = await db.from("menyarwanda_videos")
-                    .insert({title,description,youtube_url:youtubeUrl,thumbnail_url:thumbnailUrl,published:true});
-            }
-
-            if (result.error) throw result.error;
-
-            showVideoMessage(editingVideoId ? "Video updated successfully." : "Video published successfully.");
-            resetVideoForm();
-            await loadMenyarwandaVideos();
-
-        } catch (err) {
-            console.error("Video save error:",err);
-            showVideoMessage(err.message || "Failed to save video.",true);
-        } finally {
-            publishButton.disabled = false;
-        }
-    });
-
-    function editVideo(video) {
-        editingVideoId = video.id;
-        videoTitle.value = video.title || "";
-        videoDescription.value = video.description || "";
-        videoUrl.value = video.youtube_url || "";
-        publishButton.textContent = "Save Changes";
-        cancelEditButton.style.display = "inline-block";
-        previewContainer.style.display = "none";
-        previewFrame.src = "";
-        showVideoMessage("Editing video: " + video.title);
-        document.getElementById("page-videohub").scrollIntoView({behavior:"smooth",block:"start"});
-    }
-
-    async function toggleVideoStatus(video) {
-        const newStatus = !video.published;
-        const action = newStatus ? "publish" : "unpublish";
-
-        if (!confirm("Are you sure you want to "+action+" this video?")) return;
-
-        const {error} = await db.from("menyarwanda_videos")
-            .update({published:newStatus})
-            .eq("id",video.id);
-
-        if (error) {
-            alert("Could not update video: " + error.message);
-            return;
-        }
-
-        await loadMenyarwandaVideos();
-    }
-
-    async function deleteVideo(video) {
-        if (!confirm("Are you sure you want to permanently delete this video?")) return;
-
-        const {error} = await db.from("menyarwanda_videos")
-            .delete()
-            .eq("id",video.id);
-
-        if (error) {
-            alert("Could not delete video: " + error.message);
-            return;
-        }
-
-        await loadMenyarwandaVideos();
-    }
-
-    cancelEditButton.addEventListener("click",resetVideoForm);
-    refreshVideosButton.addEventListener("click",loadMenyarwandaVideos);
+const db = window.MENYARWANDA_DB;
+const $ = id => document.getElementById(id);
+const msg = (id,text,error=false) => {
+$(id).textContent = text || "";
+$(id).style.color = error ? "#ff7777" : "#91a0b5";
+};
+const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+const date = value => value ? new Date(value).toLocaleString() : "-";
+const setBusy = (id,busy) => { if($(id)) $(id).disabled = busy; };
+
+if(!db){$("admin-message").textContent="Database connection unavailable. Check js/supabase.js.";return;}
+
+const {data:sessionData,error:sessionError}=await db.auth.getSession();
+if(sessionError || !sessionData.session){location.replace("login.html");return;}
+const user=sessionData.session.user;
+
+const {data:profile,error:profileError}=await db.from("profiles").select("full_name,role").eq("id",user.id).single();
+if(profileError || !profile || profile.role!=="admin"){await db.auth.signOut();location.replace("login.html");return;}
+
+$("admin-name").textContent=profile.full_name || "Administrator";
+$("welcome-name").textContent=profile.full_name || "Administrator";
+$("admin-message").textContent="Administrator access verified.";
+
+async function logAction(action,details){
+const {error}=await db.from("admin_activity_logs").insert({admin_id:user.id,action,details});
+if(error) console.warn("Activity log error:",error.message);
+}
+
+const pages=["overview","users","courses","attendance","digital","videohub","reports"];
+const titles={overview:"Dashboard Overview",users:"Users Management",courses:"Courses Management",attendance:"Attendance Management",digital:"Digital Services",videohub:"VideoHub",reports:"Platform Reports"};
+const sections=document.querySelectorAll(".page-section");
+const nav=document.querySelectorAll(".nav-button");
+function openPage(page){
+if(!pages.includes(page))return;
+sections.forEach(s=>s.classList.remove("active"));
+$("page-"+page).classList.add("active");
+nav.forEach(b=>b.classList.toggle("active",b.dataset.page===page));
+$("current-page-title").textContent=titles[page];
+$("sidebar").classList.remove("open");
+window.scrollTo({top:0,behavior:"smooth"});
+const loaders={overview:loadStats,users:loadUsers,courses:loadCourses,attendance:loadAttendance,digital:loadServices,videohub:loadCourseOptions,reports:loadReports};
+loaders[page]?.();
+}
+nav.forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.page)));
+document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("click",()=>openPage(b.dataset.open)));
+document.querySelectorAll("[data-back]").forEach(b=>b.addEventListener("click",()=>openPage("overview")));
+$("mobile-menu").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+$("logout-button").addEventListener("click",async()=>{await db.auth.signOut();location.replace("login.html");});
+
+async function count(table){
+const {count,error}=await db.from(table).select("*",{count:"exact",head:true});
+if(error)throw error;
+return count||0;
+}
+async function loadStats(){
+const targets=[["profiles","total-users"],["courses","total-courses"],["attendance","total-attendance"],["digital_services","total-services"],["menyarwanda_videos","total-videos"]];
+for(const [table,id] of targets){
+try{$(id).textContent=(await count(table)).toLocaleString();}
+catch(e){$(id).textContent="Error";console.error(table,e);}
+}
+}
+
+let services=[];
+let courses=[];
+let videos=[];
+
+async function loadServices(){
+$("service-list").innerHTML='<p class="empty">Loading services...</p>';
+const {data,error}=await db.from("digital_services").select("*").order("created_at",{ascending:false});
+if(error){$("service-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';return;}
+services=data||[];
+renderServices();
+await fillServiceSelects();
+}
+function renderServices(){
+const q=$("service-search").value.toLowerCase().trim();
+const rows=services.filter(s=>(s.name||"").toLowerCase().includes(q)||(s.category||"").toLowerCase().includes(q));
+if(!rows.length){$("service-list").innerHTML='<p class="empty">No services found.</p>';return;}
+$("service-list").innerHTML=rows.map(s=>`
+<article class="data-card">
+${s.image_url?`<img src="${esc(s.image_url)}" alt="">`:""}
+<h4>${esc(s.name)}</h4><p>${esc(s.description||"No description")}</p>
+<p>Category: ${esc(s.category||"Uncategorized")}</p>
+<p><strong>${Number(s.price||0).toLocaleString()} ${esc(s.currency||"RWF")}</strong></p>
+<span class="status ${s.is_active?"active-status":"inactive-status"}">${s.is_active?"Active":"Inactive"}</span>
+<div>
+<button class="action secondary" data-edit-service="${s.id}">Edit</button>
+<button class="action secondary" data-toggle-service="${s.id}">${s.is_active?"Deactivate":"Activate"}</button>
+<button class="action danger" data-delete-service="${s.id}">Delete</button>
+</div></article>`).join("");
+$("service-list").querySelectorAll("[data-edit-service]").forEach(b=>b.onclick=()=>editService(b.dataset.editService));
+$("service-list").querySelectorAll("[data-toggle-service]").forEach(b=>b.onclick=()=>toggleService(b.dataset.toggleService));
+$("service-list").querySelectorAll("[data-delete-service]").forEach(b=>b.onclick=()=>deleteService(b.dataset.deleteService));
+}
+let editingService=null;
+function resetService(){
+$("service-form").reset();$("service-price").value=0;$("service-active").value="true";
+editingService=null;$("save-service").textContent="Add Service";$("cancel-service").hidden=true;
+$("service-form-heading").textContent="Add New Digital Service";
+}
+function editService(id){
+const s=services.find(x=>String(x.id)===String(id));if(!s)return;
+editingService=id;$("service-name").value=s.name||"";$("service-description").value=s.description||"";
+$("service-category").value=s.category||"";$("service-price").value=s.price??0;
+$("service-image").value=s.image_url||"";$("service-active").value=String(!!s.is_active);
+$("save-service").textContent="Save Changes";$("cancel-service").hidden=false;$("service-form-heading").textContent="Edit Digital Service";
+window.scrollTo({top:0,behavior:"smooth"});
+}
+$("service-form").addEventListener("submit",async e=>{
+e.preventDefault();setBusy("save-service",true);
+const data={name:$("service-name").value.trim(),description:$("service-description").value.trim(),category:$("service-category").value.trim(),price:Number($("service-price").value),currency:"RWF",image_url:$("service-image").value.trim()||null,is_active:$("service-active").value==="true"};
+try{
+if(!data.name||!Number.isFinite(data.price)||data.price<0)throw Error("Enter a valid service name and price.");
+const result=editingService?await db.from("digital_services").update(data).eq("id",editingService):await db.from("digital_services").insert(data);
+if(result.error)throw result.error;
+await logAction(editingService?"Updated digital service":"Created digital service",data.name);
+msg("service-message","Service saved successfully.");
+resetService();await loadServices();await loadStats();
+}catch(err){msg("service-message",err.message,true);}
+finally{setBusy("save-service",false);}
+});
+async function toggleService(id){
+const s=services.find(x=>String(x.id)===String(id));if(!s)return;
+const {error}=await db.from("digital_services").update({is_active:!s.is_active}).eq("id",id);
+if(error){alert(error.message);return;}
+await logAction("Changed service status",s.name+" → "+(!s.is_active?"Active":"Inactive"));
+await loadServices();
+}
+async function deleteService(id){
+const s=services.find(x=>String(x.id)===String(id));if(!s||!confirm("Delete service "+s.name+"?"))return;
+const {error}=await db.from("digital_services").delete().eq("id",id);
+if(error){alert(error.message);return;}
+await logAction("Deleted digital service",s.name);await loadServices();await loadStats();
+}
+$("cancel-service").onclick=resetService;
+$("refresh-services").onclick=loadServices;
+$("service-search").oninput=renderServices;
+
+async function fillServiceSelects(){
+const options='<option value="">Select service</option>'+services.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+$("course-service").innerHTML=options;
+}
+async function fillCourseSelect(){
+const {data,error}=await db.from("courses").select("id,title,service_id").order("title");
+if(error){msg("video-message",error.message,true);return;}
+courses=data||[];
+$("video-course").innerHTML='<option value="">Select course</option>'+courses.map(c=>{
+const service=services.find(s=>String(s.id)===String(c.service_id));
+return `<option value="${esc(c.id)}">${esc(service?.name||"Unassigned")} — ${esc(c.title)}</option>`;
+}).join("");
+}
+let editingCourse=null;
+function resetCourse(){
+$("course-form").reset();editingCourse=null;$("save-course").textContent="Add Course";$("cancel-course").hidden=true;$("course-form-heading").textContent="Add Course";
+}
+async function loadCourses(){
+$("course-list").innerHTML='<p class="empty">Loading courses...</p>';
+await loadServices();
+const {data,error}=await db.from("courses").select("*").order("created_at",{ascending:false});
+if(error){$("course-list").innerHTML='<p class="empty">'+esc(error.message)+'</p>';return;}
+courses=data||[];
+const {data:videoData,error:videoError}=await db.from("menyarwanda_videos").select("*").order("created_at",{ascending:false});
+if(videoError){console.error(videoError);videos=[];}else videos=videoData||[];
+renderCourses();
+await fillCourseSelect();
+}
+function renderCourses(){
+const q=$("course-search").value.toLowerCase().trim();
+const rows=courses.filter(c=>(c.title||"").toLowerCase().includes(q)||(c.description||"").toLowerCase().includes(q));
+if(!rows.length){$("course-list").innerHTML='<p class="empty">No courses found.</p>';return;}
+const groups={};
+rows.forEach(c=>{
+const s=services.find(x=>String(x.id)===String(c.service_id));
+const key=s?.name||"Unassigned service";
+(groups[key]??=[]).push(c);
+});
+$("course-list").innerHTML=Object.entries(groups).map(([group,items])=>`
+<div style="grid-column:1/-1"><h2 style="color:#00c8ff">${esc(group)}</h2></div>
+${items.map(c=>{
+const cv=videos.filter(v=>String(v.course_id)===String(c.id));
+return `<article class="data-card">
+${c.image_url?`<img src="${esc(c.image_url)}" alt="">`:""}
+<h4>${esc(c.title)}</h4><p>${esc(c.description||"No description")}</p>
+<span class="status ${c.is_active?"active-status":"inactive-status"}">${c.is_active?"Active":"Inactive"}</span>
+<p><strong>${cv.length} learning video(s)</strong></p>
+${cv.map(v=>`<p>▶ ${esc(v.title)} ${v.published?"":"(Unpublished)"}</p>`).join("")}
+<button class="action secondary" data-edit-course="${c.id}">Edit</button>
+<button class="action danger" data-delete-course="${c.id}">Delete</button>
+</article>`;
+}).join("")}`).join("");
+$("course-list").querySelectorAll("[data-edit-course]").forEach(b=>b.onclick=()=>editCourse(b.dataset.editCourse));
+$("course-list").querySelectorAll("[data-delete-course]").forEach(b=>b.onclick=()=>deleteCourse(b.dataset.deleteCourse));
+}
+$("course-form").addEventListener("submit",async e=>{
+e.preventDefault();setBusy("save-course",true);
+const data={title:$("course-title").value.trim(),description:$("course-description").value.trim(),service_id:$("course-service").value||null,image_url:$("course-image").value.trim()||null,is_active:$("course-active").value==="true"};
+try{
+if(!data.title||!data.service_id)throw Error("Enter a title and select a service.");
+const result=editingCourse?await db.from("courses").update(data).eq("id",editingCourse):await db.from("courses").insert(data);
+if(result.error)throw result.error;
+await logAction(editingCourse?"Updated course":"Created course",data.title);
+msg("course-message","Course saved successfully.");resetCourse();await loadCourses();await loadStats();
+}catch(err){msg("course-message",err.message,true);}
+finally{setBusy("save-course",false);}
+});
+function editCourse(id){
+const c=courses.find(x=>String(x.id)===String(id));if(!c)return;
+editingCourse=id;$("course-title").value=c.title||"";$("course-description").value=c.description||"";
+$("course-service").value=c.service_id||"";$("course-image").value=c.image_url||"";
+$("course-active").value=String(!!c.is_active);$("save-course").textContent="Save Changes";
+$("cancel-course").hidden=false;$("course-form-heading").textContent="Edit Course";window.scrollTo({top:0,behavior:"smooth"});
+}
+async function deleteCourse(id){
+const c=courses.find(x=>String(x.id)===String(id));if(!c||!confirm("Delete course "+c.title+"?"))return;
+const {error}=await db.from("courses").delete().eq("id",id);
+if(error){alert(error.message);return;}
+await logAction("Deleted course",c.title);await loadCourses();await loadStats();
+}
+$("cancel-course").onclick=resetCourse;
+$("refresh-courses").onclick=loadCourses;
+$("course-search").oninput=renderCourses;
+
+async function loadCourseOptions(){
+await loadServices();await fillCourseSelect();
+}
+
+async function loadUsers(){
+$("users-table").innerHTML='<tr><td colspan="5">Loading users...</td></tr>';
+const {data,error}=await db.from("profiles").select("id,full_name,phone,photo_url,role,created_at").order("created_at",{ascending:false});
+if(error){$("users-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;return;}
+const q=$("user-search").value.toLowerCase().trim();
+const rows=(data||[]).filter(p=>(p.full_name||"").toLowerCase().includes(q)||(p.phone||"").toLowerCase().includes(q));
+$("users-table").innerHTML=rows.map(p=>`<tr>
+<td>${esc(p.full_name||"Unnamed")}</td><td>${esc(p.phone||"-")}</td><td>${esc(p.role||"-")}</td><td>${esc(date(p.created_at))}</td>
+<td><button class="action secondary" data-user-edit="${p.id}">Edit</button></td></tr>`).join("")||'<tr><td colspan="5">No users found.</td></tr>';
+$("users-table").querySelectorAll("[data-user-edit]").forEach(b=>b.onclick=()=>editUser(b.dataset.userEdit,data));
+}
+function editUser(id,data){
+const p=data.find(x=>String(x.id)===String(id));if(!p)return;
+const name=prompt("User full name:",p.full_name||"");if(name===null)return;
+const phone=prompt("User phone:",p.phone||"");if(phone===null)return;
+const role=prompt("User role (student or admin):",p.role||"student");if(role===null)return;
+if(!["student","admin"].includes(role.trim().toLowerCase())){alert("Role must be student or admin.");return;}
+if(String(p.id)===String(user.id)&&role.trim().toLowerCase()!=="admin"){alert("You cannot remove your own admin role.");return;}
+updateUser(p.id,{full_name:name.trim(),phone:phone.trim(),role:role.trim().toLowerCase()});
+}
+async function updateUser(id,data){
+const {error}=await db.from("profiles").update(data).eq("id",id);
+if(error){alert(error.message);return;}
+await logAction("Updated user profile",data.full_name+" — role: "+data.role);
+await loadUsers();
+}
+$("refresh-users").onclick=loadUsers;
+$("user-search").oninput=loadUsers;
+
+async function loadAttendance(){
+$("attendance-table").innerHTML='<tr><td colspan="5">Loading attendance...</td></tr>';
+const {data,error}=await db.from("attendance").select("id,student_id,course_id,attended_at,status,profiles(full_name),courses(title)").order("attended_at",{ascending:false});
+if(error){$("attendance-table").innerHTML=`<tr><td colspan="5">${esc(error.message)}</td></tr>`;msg("attendance-message",error.message,true);return;}
+const rows=data||[];
+const grouped={};
+rows.forEach(a=>{
+const key=a.student_id+"_"+a.course_id;
+if(!grouped[key])grouped[key]={student:a.profiles?.full_name||"Unknown student",course:a.courses?.title||"Unknown course",count:0,last:a.attended_at,status:a.status};
+grouped[key].count++;
+if(new Date(a.attended_at)>new Date(grouped[key].last)){grouped[key].last=a.attended_at;grouped[key].status=a.status;}
+});
+const q=$("attendance-search").value.toLowerCase().trim();
+const list=Object.values(grouped).filter(x=>x.student.toLowerCase().includes(q)||x.course.toLowerCase().includes(q));
+$("attendance-table").innerHTML=list.map(a=>`<tr><td>${esc(a.student)}</td><td>${esc(a.course)}</td><td>${a.count}</td><td>${esc(date(a.last))}</td><td>${esc(a.status||"-")}</td></tr>`).join("")||'<tr><td colspan="5">No attendance records found.</td></tr>';
+msg("attendance-message","Showing "+list.length+" student/course attendance summaries.");
+}
+$("refresh-attendance").onclick=loadAttendance;
+$("attendance-search").oninput=loadAttendance;
+
+function getYouTubeId(value){
+try{
+const u=new URL(value.trim());const host=u.hostname.replace(/^www\./,"");let id="";
+if(host==="youtu.be")id=u.pathname.split("/").filter(Boolean)[0]||"";
+else if(["youtube.com","m.youtube.com","youtube-nocookie.com"].includes(host)){
+if(u.pathname==="/watch")id=u.searchParams.get("v")||"";
+else{const p=u.pathname.split("/").filter(Boolean);if(p.length>1&&["embed","shorts","live"].includes(p[0]))id=p[1];}
+}
+return /^[a-zA-Z0-9_-]{11}$/.test(id)?id:null;
+}catch{return null;}
+}
+$("preview-video").onclick=()=>{
+const id=getYouTubeId($("video-url").value);
+if(!id){msg("video-message","Enter a valid YouTube URL.",true);return;}
+$("video-preview").src="https://www.youtube-nocookie.com/embed/"+encodeURIComponent(id);
+$("video-preview-container").hidden=false;msg("video-message","Video preview ready.");
+};
+$("video-url").addEventListener("input",()=>{$("video-preview-container").hidden=true;$("video-preview").src="";});
+$("video-form").addEventListener("submit",async e=>{
+e.preventDefault();setBusy("save-video",true);
+const title=$("video-title").value.trim(),description=$("video-description").value.trim(),course_id=$("video-course").value,youtube_url=$("video-url").value.trim(),id=getYouTubeId(youtube_url);
+try{
+if(!id)throw Error("Enter a valid YouTube URL.");
+if(!course_id)throw Error("Select a course for this video.");
+const thumbnail_url="https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
+const {error}=await db.from("menyarwanda_videos").insert({title,description,course_id,youtube_url,thumbnail_url,published:true});
+if(error)throw error;
+await logAction("Added learning video",title+" → "+($("video-course").selectedOptions[0]?.textContent||"Course"));
+$("video-form").reset();$("video-preview").src="";$("video-preview-container").hidden=true;
+msg("video-message","Video added to its course successfully. It will appear in Courses, not in this VideoHub page.");
+await loadStats();
+}catch(err){msg("video-message",err.message,true);}
+finally{setBusy("save-video",false);}
+});
+
+let reportCache=[];
+async function loadReports(){
+$("reports-table").innerHTML='<tr><td colspan="4">Loading reports...</td></tr>';
+const {data,error}=await db.from("admin_activity_logs").select("id,action,details,admin_id,created_at").order("created_at",{ascending:false}).limit(500);
+if(error){$("reports-table").innerHTML=`<tr><td colspan="4">${esc(error.message)}</td></tr>`;msg("reports-message",error.message,true);return;}
+reportCache=data||[];
+const ids=[...new Set(reportCache.map(x=>x.admin_id).filter(Boolean))];
+let names={};
+if(ids.length){const r=await db.from("profiles").select("id,full_name").in("id",ids);if(!r.error)(r.data||[]).forEach(p=>names[p.id]=p.full_name);}
+$("reports-table").innerHTML=reportCache.map(r=>`<tr><td>${esc(r.action)}</td><td>${esc(r.details||"-")}</td><td>${esc(names[r.admin_id]||"Administrator")}</td><td>${esc(date(r.created_at))}</td></tr>`).join("")||'<tr><td colspan="4">No activity recorded yet.</td></tr>';
+msg("reports-message","Showing "+reportCache.length+" recent activity records.");
+}
+$("refresh-reports").onclick=loadReports;
+$("export-reports").onclick=()=>{
+if(!reportCache.length){alert("There are no reports to export.");return;}
+const fields=["action","details","admin_id","created_at"];
+const csv=[fields.join(","),...reportCache.map(r=>fields.map(k=>'"'+String(r[k]??"").replace(/"/g,'""')+'"').join(","))].join("\n");
+const blob=new Blob([csv],{type:"text/csv;charset=utf-8"});
+const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="menyarwanda-admin-reports.csv";a.click();URL.revokeObjectURL(url);
+};
+
+await loadStats();
 });
 </script>
 </body>
