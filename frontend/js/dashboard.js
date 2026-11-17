@@ -1,3 +1,4 @@
+
 "use strict";
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -74,44 +75,122 @@ document.addEventListener("DOMContentLoaded", async () => {
         return bubble;
     }
 
+    function splitTextIntoChunks(text, maxLength = 450) {
+        const sentences = text
+            .replace(/\s+/g, " ")
+            .trim()
+            .match(/[^.!?。؟]+[.!?。؟]?/g) || [text];
+
+        const chunks = [];
+        let current = "";
+
+        sentences.forEach((sentence) => {
+            const cleanSentence = sentence.trim();
+            if (!cleanSentence) return;
+
+            if (cleanSentence.length > maxLength) {
+                if (current) {
+                    chunks.push(current);
+                    current = "";
+                }
+
+                const words = cleanSentence.split(/\s+/);
+                let part = "";
+
+                words.forEach((word) => {
+                    if (word.length > maxLength) {
+                        if (part) {
+                            chunks.push(part);
+                            part = "";
+                        }
+                        for (let i = 0; i < word.length; i += maxLength) {
+                            chunks.push(word.slice(i, i + maxLength));
+                        }
+                        return;
+                    }
+
+                    const next = part ? `${part} ${word}` : word;
+                    if (next.length > maxLength) {
+                        if (part) chunks.push(part);
+                        part = word;
+                    } else {
+                        part = next;
+                    }
+                });
+
+                if (part) chunks.push(part);
+                return;
+            }
+
+            const next = current ? `${current} ${cleanSentence}` : cleanSentence;
+
+            if (next.length > maxLength) {
+                if (current) chunks.push(current);
+                current = cleanSentence;
+            } else {
+                current = next;
+            }
+        });
+
+        if (current) chunks.push(current);
+        return chunks;
+    }
+
     async function speakAIMessage(text, language = "rw") {
+        const chunks = splitTextIntoChunks(text);
+
+        if (!chunks.length) {
+            throw new Error("There is no text to read.");
+        }
+
+        if (window.menyarwandaAudio) {
+            window.menyarwandaAudio.pause();
+            window.menyarwandaAudio.currentTime = 0;
+            window.menyarwandaAudio = null;
+        }
+
+        if ("speechSynthesis" in window) {
+            window.speechSynthesis.cancel();
+        }
 
         if (language === "rw") {
-            if (window.menyarwandaAudio) {
-                window.menyarwandaAudio.pause();
-                window.menyarwandaAudio.currentTime = 0;
+            for (let i = 0; i < chunks.length; i++) {
+                const response = await fetch("/api/tts", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        text: chunks[i],
+                        language: "rw"
+                    })
+                });
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (error) {
+                    throw new Error("Invalid response from the voice server.");
+                }
+
+                if (!response.ok || !data.audioUrl) {
+                    throw new Error(
+                        data.message || `Could not generate voice for part ${i + 1}.`
+                    );
+                }
+
+                const audio = new Audio(data.audioUrl);
+                window.menyarwandaAudio = audio;
+
+                await new Promise((resolve, reject) => {
+                    audio.onended = resolve;
+                    audio.onerror = () => reject(
+                        new Error(`Voice playback failed at part ${i + 1}.`)
+                    );
+
+                    audio.play().catch(reject);
+                });
             }
-
-            if ("speechSynthesis" in window) {
-                window.speechSynthesis.cancel();
-            }
-
-            const response = await fetch("/api/tts", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    text: text.trim(),
-                    language: "rw"
-                })
-            });
-
-            let data;
-            try {
-                data = await response.json();
-            } catch (error) {
-                throw new Error("Invalid response from the voice server.");
-            }
-
-            if (!response.ok || !data.audioUrl) {
-                throw new Error(
-                    data.message || "Kinyarwanda voice could not be generated."
-                );
-            }
-
-            window.menyarwandaAudio = new Audio(data.audioUrl);
-            await window.menyarwandaAudio.play();
             return;
         }
 
@@ -119,25 +198,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             throw new Error("Your browser does not support voice.");
         }
 
-        window.speechSynthesis.cancel();
-
-        const speech = new SpeechSynthesisUtterance(text.trim());
         const languageCodes = {
             en: "en-US",
             fr: "fr-FR"
         };
 
-        speech.lang = languageCodes[language] || "en-US";
-        speech.rate = 0.85;
-        speech.pitch = 1;
-
-        await new Promise((resolve, reject) => {
-            speech.onend = resolve;
-            speech.onerror = () => reject(
-                new Error("Browser voice playback failed.")
-            );
-            window.speechSynthesis.speak(speech);
-        });
+        for (const chunk of chunks) {
+            await new Promise((resolve, reject) => {
+                const speech = new SpeechSynthesisUtterance(chunk);
+                speech.lang = languageCodes[language] || "en-US";
+                speech.rate = 0.85;
+                speech.pitch = 1;
+                speech.onend = resolve;
+                speech.onerror = () => reject(
+                    new Error("Browser voice playback failed.")
+                );
+                window.speechSynthesis.speak(speech);
+            });
+        }
     }
 
     function getYouTubeId(value) {
