@@ -307,3 +307,970 @@
 
                 </div>
             </section>
+            <!-- USERS -->
+            <section class="page-section" id="page-users">
+                <div class="page-heading">
+                    <h1>Users Management</h1>
+                    <p class="muted">View and manage registered users.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Users</h3>
+                    <p class="muted">Users management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- COURSES -->
+            <section class="page-section" id="page-courses">
+                <div class="page-heading">
+                    <h1>Courses Management</h1>
+                    <p class="muted">Manage learning courses.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Courses</h3>
+                    <p class="muted">Courses management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- ATTENDANCE -->
+            <section class="page-section" id="page-attendance">
+                <div class="page-heading">
+                    <h1>Attendance Management</h1>
+                    <p class="muted">View student attendance records.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Attendance</h3>
+                    <p class="muted">Attendance management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- PAYMENTS -->
+            <section class="page-section" id="page-payments">
+                <div class="page-heading">
+                    <h1>Payments Management</h1>
+                    <p class="muted">View platform payment records.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Payments</h3>
+                    <p class="muted">Payments management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- DIGITAL SERVICES -->
+            <section class="page-section" id="page-digital">
+                <div class="page-heading">
+                    <h1>Digital Services</h1>
+                    <p class="muted">Manage digital services on MENYARWANDA.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Digital Services</h3>
+                    <p class="muted">Digital services management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- VIDEOHUB -->
+            <section class="page-section" id="page-videohub">
+
+                <div class="page-heading">
+                    <h1>VideoHub Management</h1>
+                    <p class="muted">Add and manage YouTube videos on MENYARWANDA.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3 id="video-form-heading">Add New Video</h3>
+
+                    <form id="videoForm" class="video-form">
+
+                        <input type="hidden" id="video-id">
+
+                        <label for="video-title">Video Title</label>
+                        <input
+                            type="text"
+                            id="video-title"
+                            placeholder="Enter video title"
+                            required
+                        >
+
+                        <label for="video-description">Description</label>
+                        <textarea
+                            id="video-description"
+                            rows="3"
+                            placeholder="Enter video description"
+                        ></textarea>
+
+                        <label for="video-url">YouTube Video URL</label>
+                        <input
+                            type="url"
+                            id="video-url"
+                            placeholder="https://www.youtube.com/watch?v=..."
+                            required
+                        >
+
+                        <label for="video-category">Category</label>
+                        <input
+                            type="text"
+                            id="video-category"
+                            placeholder="Enter video category"
+                        >
+
+                        <button type="submit" class="video-action video-primary" id="video-submit-btn">
+                            Save Video
+                        </button>
+
+                        <button type="button" class="video-action video-secondary" id="video-cancel-btn" style="display:none;">
+                            Cancel Edit
+                        </button>
+
+                        <p id="video-message" class="muted" style="margin-top:12px;"></p>
+
+                    </form>
+                </div>
+
+                <div class="page-heading" style="margin-top:30px;">
+                    <h2>Published and Unpublished Videos</h2>
+                    <p class="muted">Manage the videos displayed on the public website.</p>
+                </div>
+
+                <div id="video-list" class="video-list">
+                    <p class="muted">Loading videos...</p>
+                </div>
+
+            </section>
+
+            <!-- MENYA AI -->
+            <section class="page-section" id="page-ai">
+                <div class="page-heading">
+                    <h1>MENYA AI</h1>
+                    <p class="muted">AI assistant management.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>MENYA AI</h3>
+                    <p class="muted">AI management module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- REPORTS -->
+            <section class="page-section" id="page-reports">
+                <div class="page-heading">
+                    <h1>Reports</h1>
+                    <p class="muted">Platform statistics and reports.</p>
+                </div>
+
+                <div class="panel-placeholder">
+                    <h3>Reports</h3>
+                    <p class="muted">Reports module will be managed here.</p>
+                </div>
+            </section>
+
+            <!-- SETTINGS -->
+            <section class="page-section" id="page-settings">
+
+                <div class="page-heading">
+                    <h1>Administrator Settings</h1>
+                    <p class="muted">Manage your administrator profile and account security.</p>
+                </div>
+
+                <div class="settings-grid">
+
+                    <div class="settings-card">
+                        <h3>👤 Administrator Profile</h3>
+
+                        <form id="adminProfileForm">
+
+                            <label for="settings-admin-name">Full Name</label>
+                            <input
+                                type="text"
+                                id="settings-admin-name"
+                                placeholder="Enter your full name"
+                                required
+                            >
+
+                            <label for="settings-admin-email">Email Address</label>
+                            <input
+                                type="email"
+                                id="settings-admin-email"
+                                readonly
+                            >
+
+                            <button type="submit" class="settings-button" id="save-profile-btn">
+                                Save Profile
+                            </button>
+
+                            <p id="profile-settings-message" class="settings-message"></p>
+
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>🔐 Account Security</h3>
+
+                        <form id="adminPasswordForm">
+
+                            <label for="new-admin-password">New Password</label>
+                            <input
+                                type="password"
+                                id="new-admin-password"
+                                placeholder="Enter new password"
+                                minlength="8"
+                                required
+                            >
+
+                            <label for="confirm-admin-password">Confirm New Password</label>
+                            <input
+                                type="password"
+                                id="confirm-admin-password"
+                                placeholder="Confirm new password"
+                                minlength="8"
+                                required
+                            >
+
+                            <button type="submit" class="settings-button" id="save-password-btn">
+                                Update Password
+                            </button>
+
+                            <p id="password-settings-message" class="settings-message"></p>
+
+                        </form>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>ℹ️ Platform Information</h3>
+
+                        <div class="info-row">
+                            <span>Platform Name</span>
+                            <span>MENYARWANDA</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Account Type</span>
+                            <span>Administrator</span>
+                        </div>
+
+                        <div class="info-row">
+                            <span>Account Status</span>
+                            <span>Verified</span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+</div>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL = "https://ewqdwmrxklqglqkylxgo.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_nx7hYVOX0Tz1-ewVTns7lw_WFwYrhDd";
+
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentAdmin = null;
+let currentSession = null;
+
+const adminMessage = document.getElementById("admin-message");
+
+const pageTitles = {
+    overview: "Overview",
+    users: "Users Management",
+    courses: "Courses Management",
+    attendance: "Attendance Management",
+    payments: "Payments Management",
+    digital: "Digital Services",
+    videohub: "VideoHub Management",
+    ai: "MENYA AI",
+    reports: "Reports",
+    settings: "Settings"
+};
+
+function showAdminMessage(message, type = "info") {
+    adminMessage.textContent = message;
+
+    if (type === "error") {
+        adminMessage.style.color = "#ff8585";
+    } else if (type === "success") {
+        adminMessage.style.color = "#7dffb0";
+    } else {
+        adminMessage.style.color = "#91a0b5";
+    }
+}
+
+function showPage(pageName) {
+    const targetPage = document.getElementById("page-" + pageName);
+
+    if (!targetPage) {
+        return;
+    }
+
+    document.querySelectorAll(".page-section").forEach(section => {
+        section.classList.remove("active");
+    });
+
+    targetPage.classList.add("active");
+
+    document.querySelectorAll(".nav-button").forEach(button => {
+        button.classList.remove("active");
+    });
+
+    const activeButton = document.querySelector(
+        '.nav-button[data-page="' + pageName + '"]'
+    );
+
+    if (activeButton) {
+        activeButton.classList.add("active");
+    }
+
+    document.getElementById("page-title").textContent =
+        pageTitles[pageName] || "Admin Dashboard";
+
+    document.getElementById("sidebar").classList.remove("open");
+
+    if (pageName === "videohub") {
+        loadMenyarwandaVideos();
+    }
+}
+
+document.querySelectorAll(".nav-button").forEach(button => {
+    button.addEventListener("click", () => {
+        showPage(button.dataset.page);
+    });
+});
+
+document.querySelectorAll("[data-open-page]").forEach(card => {
+    card.addEventListener("click", () => {
+        showPage(card.dataset.openPage);
+    });
+});
+
+document.getElementById("mobileMenu").addEventListener("click", () => {
+    document.getElementById("sidebar").classList.toggle("open");
+});
+
+async function checkAdminAccess() {
+    try {
+        const {
+            data: { session },
+            error: sessionError
+        } = await db.auth.getSession();
+
+        if (sessionError) {
+            throw sessionError;
+        }
+
+        if (!session) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        currentSession = session;
+
+        const { data: profile, error: profileError } = await db
+            .from("profiles")
+            .select("full_name, role")
+            .eq("id", session.user.id)
+            .single();
+
+        if (profileError) {
+            throw profileError;
+        }
+
+        if (!profile || profile.role !== "admin") {
+            await db.auth.signOut();
+            window.location.href = "login.html";
+            return;
+        }
+
+        currentAdmin = profile;
+
+        const adminName = profile.full_name || "Administrator";
+
+        document.getElementById("admin-name").textContent = adminName;
+
+        document.getElementById("settings-admin-name").value = adminName;
+
+        document.getElementById("settings-admin-email").value =
+            session.user.email || "";
+
+        showAdminMessage("Welcome back, " + adminName, "success");
+
+        await loadDashboardStats();
+
+    } catch (error) {
+        console.error("Admin access error:", error);
+
+        showAdminMessage(
+            error.message || "Could not verify administrator access.",
+            "error"
+        );
+    }
+}
+
+async function loadDashboardStats() {
+    const tables = [
+        {
+            table: "profiles",
+            element: "total-users"
+        },
+        {
+            table: "courses",
+            element: "total-courses"
+        },
+        {
+            table: "attendance",
+            element: "total-attendance"
+        },
+        {
+            table: "payments",
+            element: "total-payments"
+        }
+    ];
+
+    for (const item of tables) {
+        try {
+            const { count, error } = await db
+                .from(item.table)
+                .select("*", { count: "exact", head: true });
+
+            if (error) {
+                throw error;
+            }
+
+            document.getElementById(item.element).textContent =
+                count ?? 0;
+
+        } catch (error) {
+            console.error("Could not load " + item.table + " count:", error);
+
+            document.getElementById(item.element).textContent = "—";
+        }
+    }
+}
+
+document.getElementById("logoutBtn").addEventListener("click", async () => {
+    const { error } = await db.auth.signOut();
+
+    if (error) {
+        showAdminMessage(error.message, "error");
+        return;
+    }
+
+    window.location.href = "login.html";
+});
+
+/* ADMIN PROFILE SETTINGS */
+
+document.getElementById("adminProfileForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    if (!currentSession) {
+        return;
+    }
+
+    const nameInput = document.getElementById("settings-admin-name");
+    const saveButton = document.getElementById("save-profile-btn");
+    const message = document.getElementById("profile-settings-message");
+
+    const fullName = nameInput.value.trim();
+
+    message.textContent = "";
+    message.className = "settings-message";
+
+    if (!fullName) {
+        message.textContent = "Please enter your full name.";
+        message.classList.add("error");
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Saving...";
+
+    try {
+        const { error } = await db
+            .from("profiles")
+            .update({
+                full_name: fullName
+            })
+            .eq("id", currentSession.user.id);
+
+        if (error) {
+            throw error;
+        }
+
+        currentAdmin.full_name = fullName;
+
+        document.getElementById("admin-name").textContent = fullName;
+
+        message.textContent = "Administrator profile updated successfully.";
+        message.classList.add("success");
+
+        showAdminMessage("Profile updated successfully.", "success");
+
+    } catch (error) {
+        console.error("Profile update error:", error);
+
+        message.textContent =
+            error.message || "Could not update administrator profile.";
+
+        message.classList.add("error");
+
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Save Profile";
+    }
+});
+        /* ADMIN PASSWORD SETTINGS */
+
+document.getElementById("adminPasswordForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const passwordInput = document.getElementById("new-admin-password");
+    const confirmInput = document.getElementById("confirm-admin-password");
+    const saveButton = document.getElementById("save-password-btn");
+    const message = document.getElementById("password-settings-message");
+
+    const newPassword = passwordInput.value;
+    const confirmPassword = confirmInput.value;
+
+    message.textContent = "";
+    message.className = "settings-message";
+
+    if (newPassword.length < 8) {
+        message.textContent = "Password must contain at least 8 characters.";
+        message.classList.add("error");
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        message.textContent = "The passwords do not match.";
+        message.classList.add("error");
+        return;
+    }
+
+    saveButton.disabled = true;
+    saveButton.textContent = "Updating...";
+
+    try {
+        const { error } = await db.auth.updateUser({
+            password: newPassword
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        passwordInput.value = "";
+        confirmInput.value = "";
+
+        message.textContent = "Password updated successfully.";
+        message.classList.add("success");
+
+        showAdminMessage("Password updated successfully.", "success");
+
+    } catch (error) {
+        console.error("Password update error:", error);
+
+        message.textContent =
+            error.message || "Could not update password.";
+
+        message.classList.add("error");
+
+    } finally {
+        saveButton.disabled = false;
+        saveButton.textContent = "Update Password";
+    }
+});
+
+/* VIDEOHUB MANAGEMENT */
+
+const videoForm = document.getElementById("videoForm");
+const videoList = document.getElementById("video-list");
+const videoMessage = document.getElementById("video-message");
+
+function showVideoMessage(message, type = "info") {
+    videoMessage.textContent = message;
+
+    if (type === "error") {
+        videoMessage.style.color = "#ff8585";
+    } else if (type === "success") {
+        videoMessage.style.color = "#7dffb0";
+    } else {
+        videoMessage.style.color = "#91a0b5";
+    }
+}
+
+function getYouTubeVideoId(url) {
+    try {
+        const parsedUrl = new URL(url);
+
+        if (parsedUrl.hostname.includes("youtu.be")) {
+            return parsedUrl.pathname.slice(1).split("/")[0];
+        }
+
+        if (parsedUrl.hostname.includes("youtube.com")) {
+            if (parsedUrl.pathname === "/watch") {
+                return parsedUrl.searchParams.get("v");
+            }
+
+            if (parsedUrl.pathname.startsWith("/embed/")) {
+                return parsedUrl.pathname.split("/")[2];
+            }
+
+            if (parsedUrl.pathname.startsWith("/shorts/")) {
+                return parsedUrl.pathname.split("/")[2];
+            }
+        }
+
+        return null;
+
+    } catch (error) {
+        return null;
+    }
+}
+
+function resetVideoForm() {
+    videoForm.reset();
+
+    document.getElementById("video-id").value = "";
+
+    document.getElementById("video-form-heading").textContent =
+        "Add New Video";
+
+    document.getElementById("video-submit-btn").textContent =
+        "Save Video";
+
+    document.getElementById("video-cancel-btn").style.display =
+        "none";
+
+    showVideoMessage("");
+}
+
+document.getElementById("video-cancel-btn").addEventListener("click", () => {
+    resetVideoForm();
+});
+
+async function loadMenyarwandaVideos() {
+    videoList.innerHTML = '<p class="muted">Loading videos...</p>';
+
+    try {
+        const { data: videos, error } = await db
+            .from("menyarwanda_videos")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            throw error;
+        }
+
+        if (!videos || videos.length === 0) {
+            videoList.innerHTML =
+                '<p class="muted">No videos have been added yet.</p>';
+            return;
+        }
+
+        videoList.innerHTML = "";
+
+        videos.forEach(video => {
+            const videoId = getYouTubeVideoId(video.youtube_url || "");
+
+            const card = document.createElement("div");
+            card.className = "video-item";
+
+            const title = document.createElement("h3");
+            title.textContent = video.title || "Untitled video";
+
+            const description = document.createElement("p");
+            description.textContent =
+                video.description || "No description";
+
+            const category = document.createElement("p");
+            category.textContent =
+                "Category: " + (video.category || "General");
+
+            const status = document.createElement("span");
+            status.className = video.is_published
+                ? "video-status"
+                : "video-status unpublished";
+
+            status.textContent = video.is_published
+                ? "Published"
+                : "Unpublished";
+
+            const preview = document.createElement("div");
+
+            if (videoId) {
+                const iframe = document.createElement("iframe");
+                iframe.src =
+                    "https://www.youtube.com/embed/" +
+                    encodeURIComponent(videoId);
+
+                iframe.title = video.title || "YouTube video";
+                iframe.allow =
+                    "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+
+                iframe.allowFullscreen = true;
+
+                preview.appendChild(iframe);
+            } else {
+                const invalid = document.createElement("p");
+                invalid.textContent = "Invalid YouTube URL.";
+                invalid.style.color = "#ff8585";
+                preview.appendChild(invalid);
+            }
+
+            const actions = document.createElement("div");
+            actions.style.marginTop = "12px";
+
+            const editButton = document.createElement("button");
+            editButton.className = "video-action video-secondary";
+            editButton.textContent = "Edit";
+            editButton.addEventListener("click", () => {
+                editVideo(video);
+            });
+
+            const publishButton = document.createElement("button");
+            publishButton.className = "video-action video-primary";
+            publishButton.textContent = video.is_published
+                ? "Unpublish"
+                : "Publish";
+
+            publishButton.addEventListener("click", () => {
+                toggleVideoStatus(video.id, video.is_published);
+            });
+
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "video-action video-danger";
+            deleteButton.textContent = "Delete";
+
+            deleteButton.addEventListener("click", () => {
+                deleteVideo(video.id);
+            });
+
+            actions.appendChild(editButton);
+            actions.appendChild(publishButton);
+            actions.appendChild(deleteButton);
+
+            card.appendChild(preview);
+            card.appendChild(title);
+            card.appendChild(description);
+            card.appendChild(category);
+            card.appendChild(status);
+            card.appendChild(actions);
+
+            videoList.appendChild(card);
+        });
+
+    } catch (error) {
+        console.error("VideoHub loading error:", error);
+
+        videoList.innerHTML =
+            '<p style="color:#ff8585;">Could not load videos: ' +
+            error.message +
+            "</p>";
+    }
+}
+                function editVideo(video) {
+    document.getElementById("video-id").value = video.id;
+
+    document.getElementById("video-title").value =
+        video.title || "";
+
+    document.getElementById("video-description").value =
+        video.description || "";
+
+    document.getElementById("video-url").value =
+        video.youtube_url || "";
+
+    document.getElementById("video-category").value =
+        video.category || "";
+
+    document.getElementById("video-form-heading").textContent =
+        "Edit Video";
+
+    document.getElementById("video-submit-btn").textContent =
+        "Update Video";
+
+    document.getElementById("video-cancel-btn").style.display =
+        "inline-block";
+
+    showVideoMessage("You are editing: " + (video.title || "video"));
+
+    document.getElementById("video-form-heading").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+    });
+}
+
+videoForm.addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const videoId = document.getElementById("video-id").value;
+
+    const title = document.getElementById("video-title").value.trim();
+    const description = document.getElementById("video-description").value.trim();
+    const youtubeUrl = document.getElementById("video-url").value.trim();
+    const category = document.getElementById("video-category").value.trim();
+
+    const youtubeVideoId = getYouTubeVideoId(youtubeUrl);
+
+    if (!youtubeVideoId) {
+        showVideoMessage("Please enter a valid YouTube video URL.", "error");
+        return;
+    }
+
+    const submitButton = document.getElementById("video-submit-btn");
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Saving...";
+
+    const videoData = {
+        title,
+        description,
+        youtube_url: youtubeUrl,
+        category
+    };
+
+    try {
+        let result;
+
+        if (videoId) {
+            result = await db
+                .from("menyarwanda_videos")
+                .update(videoData)
+                .eq("id", videoId);
+        } else {
+            result = await db
+                .from("menyarwanda_videos")
+                .insert({
+                    ...videoData,
+                    is_published: false
+                });
+        }
+
+        if (result.error) {
+            throw result.error;
+        }
+
+        showVideoMessage(
+            videoId
+                ? "Video updated successfully."
+                : "Video added successfully.",
+            "success"
+        );
+
+        resetVideoForm();
+
+        await loadMenyarwandaVideos();
+
+    } catch (error) {
+        console.error("Video save error:", error);
+
+        showVideoMessage(
+            error.message || "Could not save video.",
+            "error"
+        );
+
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = videoId
+            ? "Update Video"
+            : "Save Video";
+    }
+});
+
+async function toggleVideoStatus(id, currentStatus) {
+    const action = currentStatus ? "unpublish" : "publish";
+
+    if (!confirm("Are you sure you want to " + action + " this video?")) {
+        return;
+    }
+
+    try {
+        const { error } = await db
+            .from("menyarwanda_videos")
+            .update({
+                is_published: !currentStatus
+            })
+            .eq("id", id);
+
+        if (error) {
+            throw error;
+        }
+
+        showVideoMessage(
+            currentStatus
+                ? "Video unpublished successfully."
+                : "Video published successfully.",
+            "success"
+        );
+
+        await loadMenyarwandaVideos();
+
+    } catch (error) {
+        console.error("Video status error:", error);
+
+        showVideoMessage(
+            error.message || "Could not change video status.",
+            "error"
+        );
+    }
+}
+
+async function deleteVideo(id) {
+    if (!confirm("Are you sure you want to permanently delete this video?")) {
+        return;
+    }
+
+    try {
+        const { error } = await db
+            .from("menyarwanda_videos")
+            .delete()
+            .eq("id", id);
+
+        if (error) {
+            throw error;
+        }
+
+        showVideoMessage("Video deleted successfully.", "success");
+
+        await loadMenyarwandaVideos();
+
+    } catch (error) {
+        console.error("Video delete error:", error);
+
+        showVideoMessage(
+            error.message || "Could not delete video.",
+            "error"
+        );
+    }
+}
+
+function previewVideo(url) {
+    const videoId = getYouTubeVideoId(url);
+
+    if (!videoId) {
+        alert("Invalid YouTube URL.");
+        return;
+    }
+
+    window.open(
+        "https://www.youtube.com/watch?v=" + encodeURIComponent(videoId),
+        "_blank",
+        "noopener,noreferrer"
+    );
+}
+
+/* START ADMIN DASHBOARD */
+
+checkAdminAccess();
+
+</script>
+
+</body>
+</html>
+    
