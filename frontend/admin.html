@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -480,15 +479,47 @@ await loadServices();
 await loadVideoServiceOptions();
 }
 
+/* Updated service deletion: check linked videos before deleting. */
 async function deleteService(id){
 const s=services.find(x=>String(x.id)===String(id));
-if(!s||!confirm("Delete service "+s.name+"? Videos assigned to it may become unassigned."))return;
+if(!s)return;
+
+if(!confirm("Delete service "+s.name+"? This action cannot be undone."))return;
+
+try{
+const {data:linkedVideos,error:checkError}=await db
+.from("menyarwanda_videos")
+.select("id,title")
+.eq("service_id",id);
+
+if(checkError)throw checkError;
+
+if(linkedVideos&&linkedVideos.length){
+const videoNames=linkedVideos.slice(0,5).map(v=>"• "+(v.title||"Untitled video")).join("\n");
+const more=linkedVideos.length>5?"\n...and "+(linkedVideos.length-5)+" more video(s).":"";
+
+alert(
+'Cannot delete "'+s.name+'" because '+linkedVideos.length+
+' learning video(s) are assigned to it.\n\n'+
+videoNames+more+
+'\n\nGo to Courses, delete these videos or edit them and assign them to another service. Then try deleting this service again.'
+);
+return;
+}
+
 const {error}=await db.from("digital_services").delete().eq("id",id);
-if(error){alert(error.message);return;}
+if(error)throw error;
+
 await logAction("Deleted digital service",s.name);
+alert("Service deleted successfully.");
+
 await loadServices();
 await loadCourses();
 await loadStats();
+}catch(err){
+console.error("Delete service error:",err);
+alert("Service could not be deleted: "+(err.message||"Unknown database error"));
+}
 }
 
 $("cancel-service").onclick=resetService;
@@ -707,10 +738,14 @@ $("users-table").innerHTML=rows.map(p=>`
 <td>${esc(p.phone||"-")}</td>
 <td>${esc(p.role||"-")}</td>
 <td>${esc(date(p.created_at))}</td>
-<td><button class="action secondary" data-user-edit="${esc(p.id)}">Edit</button></td>
+<td>
+<button class="action secondary" data-user-edit="${esc(p.id)}">Edit</button>
+<button class="action danger" data-user-delete="${esc(p.id)}" ${String(p.id)===String(user.id)?"disabled":""}>Delete</button>
+</td>
 </tr>`).join("")||'<tr><td colspan="5">No users found.</td></tr>';
 
 $("users-table").querySelectorAll("[data-user-edit]").forEach(b=>b.onclick=()=>editUser(b.dataset.userEdit,data));
+$("users-table").querySelectorAll("[data-user-delete]").forEach(b=>b.onclick=()=>deleteUser(b.dataset.userDelete,data));
 }
 
 function editUser(id,data){
@@ -745,6 +780,41 @@ const {error}=await db.from("profiles").update(data).eq("id",id);
 if(error){alert(error.message);return;}
 await logAction("Updated user profile",data.full_name+" — role: "+data.role);
 await loadUsers();
+}
+
+/* Delete a user securely through the Supabase Edge Function. */
+async function deleteUser(id,data){
+const p=data.find(x=>String(x.id)===String(id));
+if(!p)return;
+
+if(String(id)===String(user.id)){
+alert("You cannot delete your own administrator account.");
+return;
+}
+
+const name=p.full_name||p.phone||"this user";
+if(!confirm('Are you sure you want to permanently delete "'+name+'"? This will delete the user account from the authentication system too.'))return;
+
+try{
+msg("users-message","Deleting user account...");
+
+const {data:result,error}=await db.functions.invoke("delete-user",{
+body:{user_id:id}
+});
+
+if(error)throw error;
+if(result?.error)throw new Error(result.error);
+
+await logAction("Deleted user account",name+" ("+id+")");
+msg("users-message","User account deleted successfully.");
+
+await loadUsers();
+await loadStats();
+await loadAttendance();
+}catch(err){
+console.error("Delete user error:",err);
+msg("users-message","Could not delete user: "+(err.message||"Unknown error")+". Check that the delete-user Edge Function is deployed.",true);
+}
 }
 
 $("refresh-users").onclick=loadUsers;
