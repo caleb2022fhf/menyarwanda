@@ -212,6 +212,9 @@ td{color:#d5deea}
 <label>Description</label><textarea id="video-description" rows="3"></textarea>
 <label>Choose Digital Service</label>
 <select id="video-service" required><option value="">Select Digital Service</option></select>
+<label>Learning Day</label>
+<input id="video-learning-day" type="number" min="1" step="1" value="1" required>
+<p class="muted" style="font-size:12px;margin-top:6px">Choose the attendance day this video belongs to. For example, enter 1 for Day 1 or 13 for Day 13.</p>
 <label>YouTube URL</label><input id="video-url" type="url" placeholder="https://www.youtube.com/watch?v=..." required>
 <div id="video-preview-container" hidden>
 <h3>Preview</h3>
@@ -516,7 +519,7 @@ return;
 services=serviceResult.data||[];
 
 const {data,error}=await db.from("menyarwanda_videos")
-.select("id,title,description,youtube_url,thumbnail_url,published,created_at,service_id")
+.select("id,title,description,youtube_url,thumbnail_url,published,created_at,service_id,learning_day")
 .order("created_at",{ascending:false});
 
 if(error){
@@ -586,6 +589,7 @@ return `
 ${thumbnail?`<img src="${esc(thumbnail)}" alt="${esc(v.title)}">`:""}
 <h4>${esc(v.title)}</h4>
 <p>${esc(v.description||"No description")}</p>
+<p>Learning Day: ${esc(v.learning_day ?? "Not assigned")}</p>
 <p>Added: ${esc(date(v.created_at))}</p>
 <span class="status ${v.published?"active-status":"inactive-status"}">${v.published?"Published":"Unpublished"}</span>
 ${youtubeId?`<div class="video-frame"><iframe src="https://www.youtube-nocookie.com/embed/${esc(youtubeId)}" title="${esc(v.title)}" loading="lazy" allowfullscreen></iframe></div>`:""}
@@ -622,6 +626,14 @@ if(choice===null)return;
 const selected=serviceOptions[Number(choice)-1];
 if(!selected){alert("Invalid service selection.");return;}
 
+const learningDayInput=prompt("Learning Day (attendance day):",String(v.learning_day ?? 1));
+if(learningDayInput===null)return;
+const learning_day=Number(learningDayInput.trim());
+if(!Number.isInteger(learning_day)||learning_day<1){
+alert("Learning Day must be a whole number greater than 0.");
+return;
+}
+
 const youtubeId=getYouTubeId(url);
 if(!youtubeId){alert("Enter a valid YouTube URL.");return;}
 
@@ -630,7 +642,8 @@ title:title.trim(),
 description:description.trim(),
 youtube_url:url.trim(),
 thumbnail_url:"https://img.youtube.com/vi/"+youtubeId+"/hqdefault.jpg",
-service_id:selected.id
+service_id:selected.id,
+learning_day
 });
 }
 
@@ -815,6 +828,7 @@ setBusy("save-video",true);
 const title=$("video-title").value.trim();
 const description=$("video-description").value.trim();
 const service_id=$("video-service").value;
+const learning_day=Number($("video-learning-day").value);
 const youtube_url=$("video-url").value.trim();
 const youtubeId=getYouTubeId(youtube_url);
 
@@ -822,6 +836,7 @@ try{
 if(!title)throw Error("Enter the video title.");
 if(!youtubeId)throw Error("Enter a valid YouTube URL.");
 if(!service_id)throw Error("Select a Digital Service.");
+if(!Number.isInteger(learning_day)||learning_day<1)throw Error("Learning Day must be a whole number greater than 0.");
 
 const selectedService=services.find(s=>String(s.id)===String(service_id));
 if(!selectedService)throw Error("Selected service was not found. Refresh and try again.");
@@ -832,6 +847,7 @@ const {error}=await db.from("menyarwanda_videos").insert({
 title,
 description,
 service_id,
+learning_day,
 youtube_url,
 thumbnail_url,
 published:true
@@ -839,13 +855,13 @@ published:true
 
 if(error)throw error;
 
-await logAction("Added learning video",title+" → "+selectedService.name);
+await logAction("Added learning video",title+" → "+selectedService.name+" → Learning Day "+learning_day);
 
 $("video-form").reset();
 $("video-preview").src="";
 $("video-preview-container").hidden=true;
 
-msg("video-message","Video successfully added to Courses under "+selectedService.name+".");
+msg("video-message","Video successfully added to Courses under "+selectedService.name+" for Learning Day "+learning_day+".");
 
 await loadStats();
 
