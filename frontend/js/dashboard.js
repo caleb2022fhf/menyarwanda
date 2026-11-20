@@ -21,14 +21,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     let currentUser = null;
     let currentServiceId = null;
     let currentSessionId = null;
+    let currentAiSessionId = null;
+    let aiExpiresAt = null;
+
     let youtubePlayer = null;
     let heartbeatTimer = null;
+    let aiCountdownTimer = null;
+
     let playerCompleted = false;
     let loadingService = false;
+    let finishingAiSession = false;
+    let lastFinishAttempt = 0;
 
     function showMessage(text, color = "#ff5555") {
         if (!message) return;
-
         message.textContent = text;
         message.style.color = color;
     }
@@ -41,6 +47,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             '"': "&quot;",
             "'": "&#039;"
         })[character]);
+    }
+
+    function setAIEnabled(enabled) {
+        if (aiQuestion) aiQuestion.disabled = !enabled;
+        if (aiSendButton) aiSendButton.disabled = !enabled;
     }
 
     function addAIMessage(text, sender = "assistant", language = "rw") {
@@ -71,7 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     await speakAIMessage(text, language);
                 } catch (error) {
                     console.error("Voice error:", error);
-
                     if (aiStatus) {
                         aiStatus.textContent =
                             "Unable to play the voice. Please try again.";
@@ -167,7 +177,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     audio.onerror = () => reject(
                         new Error("Voice playback failed.")
                     );
-
                     audio.play().catch(reject);
                 });
             }
@@ -191,7 +200,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 speech.lang = languageCodes[language] || "en-US";
                 speech.rate = 0.85;
                 speech.pitch = 1;
-
                 speech.onend = resolve;
                 speech.onerror = () => reject(
                     new Error("Browser voice playback failed.")
@@ -256,7 +264,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (typeof oldCallback === "function") {
                     oldCallback();
                 }
-
                 resolve();
             };
 
@@ -270,7 +277,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 script.onerror = () => reject(
                     new Error("Unable to load YouTube Player API.")
                 );
-
                 document.head.appendChild(script);
             }
 
@@ -288,6 +294,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (heartbeatTimer) {
             clearInterval(heartbeatTimer);
             heartbeatTimer = null;
+        }
+    }
+
+    function stopAiCountdown() {
+        if (aiCountdownTimer) {
+            clearInterval(aiCountdownTimer);
+            aiCountdownTimer = null;
         }
     }
 
@@ -320,77 +333,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (error) {
                 console.error("Heartbeat error:", error);
             }
-
         } catch (error) {
             console.error("Heartbeat error:", error);
-        }
-    }
-
-    async function completeCurrentVideo() {
-        if (playerCompleted || !currentSessionId || !youtubePlayer) {
-            return;
-        }
-
-        playerCompleted = true;
-        stopHeartbeat();
-
-        const finishPosition = Math.floor(
-            youtubePlayer.getCurrentTime() || 0
-        );
-
-        try {
-            await sendFinalHeartbeat();
-
-            const { error } = await db.rpc(
-                "complete_video_watch_session",
-                {
-                    p_session_id: currentSessionId,
-                    p_final_position_seconds: finishPosition
-                }
-            );
-
-            if (error) {
-                throw error;
-            }
-
-            showMessage(
-                "Congratulations! Your Attendance has been recorded.",
-                "#00c8ff"
-            );
-
-            videosList.innerHTML = `
-                <div class="card empty-state">
-                    <h3>Lesson completed successfully!</h3>
-                    <p>Your Attendance has been recorded.</p>
-                    <p>Loading your next learning day...</p>
-                </div>
-            `;
-
-            const completedService = currentServiceId;
-
-            currentSessionId = null;
-            youtubePlayer = null;
-
-            setTimeout(() => {
-                loadServiceVideo(completedService);
-            }, 1500);
-
-        } catch (error) {
-            console.error("Video completion error:", error);
-
-            playerCompleted = false;
-
-            showMessage(
-                error.message ||
-                "Attendance could not be recorded. Please try again."
-            );
-
-            videosList.innerHTML += `
-                <div class="card empty-state">
-                    Video completion could not be confirmed.
-                    Please contact your administrator.
-                </div>
-            `;
         }
     }
 
@@ -429,8 +373,235 @@ document.addEventListener("DOMContentLoaded", async () => {
             const state = youtubePlayer.getPlayerState();
 
             await sendHeartbeat(state === YT.PlayerState.PLAYING);
-
         }, 15000);
+    }
+
+    function showAiLearningPanel() {
+        if (!videosList) return;
+
+        videosList.innerHTML = `
+            <div class="card empty-state">
+                <h3>Video completed successfully!</h3>
+                <p>Your 10-minute MENYARWANDA AI learning session has started.</p>
+                <p>Ask questions about anything you did not understand in the video.</p>
+                <h3 id="ai-countdown-display"
+                    style="color:#00c8ff;margin-top:18px;">
+                    10:00
+                </h3>
+            </div>
+        `;
+    }
+
+    function updateAiCountdown() {
+        if (!currentAiSessionId || !aiExpiresAt) return;
+
+        const remaining = Math.max(
+            0,
+            Math.ceil((aiExpiresAt - Date.now()) / 1000)
+        );
+
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+
+        const display = document.getElementById("ai-countdown-display");
+
+        const countdownText =
+            `${String(minutes).padStart(2, "0")}:` +
+            `${String(seconds).padStart(2, "0")}`;
+
+        if (display) {
+            display.textContent = countdownText;
+        }
+
+        if (aiStatus) {
+            aiStatus.textContent =
+                remaining > 0
+                    ? `MENYARWANDA AI session time remaining: ${countdownText}`
+                    : "Your AI learning time has ended. Submitting attendance...";
+        }
+
+        if (remaining <= 0) {
+            setAIEnabled(false);
+
+            if (
+                !finishingAiSession &&
+                Date.now() - lastFinishAttempt > 5000
+            ) {
+                finishAiLearningSession();
+            }
+        }
+    }
+
+    async function startAiCountdown(expiresAt) {
+        stopAiCountdown();
+
+        aiExpiresAt = new Date(expiresAt).getTime();
+
+        if (!Number.isFinite(aiExpiresAt)) {
+            throw new Error("Invalid AI session expiry time.");
+        }
+
+        setAIEnabled(true);
+
+        if (aiStatus) {
+            aiStatus.textContent =
+                "Your 10-minute MENYARWANDA AI session is active.";
+        }
+
+        updateAiCountdown();
+
+        aiCountdownTimer = setInterval(() => {
+            updateAiCountdown();
+        }, 1000);
+    }
+
+    async function finishAiLearningSession() {
+        if (!currentAiSessionId || finishingAiSession) return;
+
+        if (Date.now() < aiExpiresAt) return;
+
+        finishingAiSession = true;
+        lastFinishAttempt = Date.now();
+
+        setAIEnabled(false);
+
+        try {
+            const { data, error } = await db.rpc(
+                "finish_ai_learning_session",
+                {
+                    p_session_id: currentAiSessionId
+                }
+            );
+
+            if (error) throw error;
+
+            if (data !== true) {
+                throw new Error(
+                    "Attendance could not be confirmed."
+                );
+            }
+
+            stopAiCountdown();
+
+            currentAiSessionId = null;
+            aiExpiresAt = null;
+
+            if (aiStatus) {
+                aiStatus.textContent =
+                    "Your 10-minute session is complete. Your attendance has been recorded.";
+            }
+
+            addAIMessage(
+                "Your 10-minute learning session is complete. Your attendance has been recorded. You can continue learning when the next day arrives.",
+                "assistant",
+                "rw"
+            );
+
+            showMessage(
+                "Your attendance has been recorded successfully.",
+                "#00c8ff"
+            );
+
+            const completedService = currentServiceId;
+
+            await loadServiceVideo(completedService);
+
+        } catch (error) {
+            console.error("AI session completion error:", error);
+
+            if (aiStatus) {
+                aiStatus.textContent =
+                    "Attendance submission failed. Retrying automatically...";
+            }
+
+        } finally {
+            finishingAiSession = false;
+        }
+    }
+
+    async function startAiLearningSession(videoId) {
+        const { data, error } = await db.rpc(
+            "start_ai_learning_session",
+            {
+                p_video_id: videoId
+            }
+        );
+
+        if (error) throw error;
+
+        const session = Array.isArray(data) ? data[0] : data;
+
+        if (!session || !session.session_id || !session.expires_at) {
+            throw new Error(
+                "MENYARWANDA AI session could not be started."
+            );
+        }
+
+        currentAiSessionId = session.session_id;
+
+        showAiLearningPanel();
+
+        addAIMessage(
+            "Congratulations! You have completed the video. You now have 10 minutes to ask me questions about the lesson. What would you like me to explain?",
+            "assistant",
+            "rw"
+        );
+
+        await startAiCountdown(session.expires_at);
+    }
+
+    async function completeCurrentVideo() {
+        if (playerCompleted || !currentSessionId || !youtubePlayer) {
+            return;
+        }
+
+        playerCompleted = true;
+        stopHeartbeat();
+
+        const completedVideoSessionId = currentSessionId;
+        const completedService = currentServiceId;
+
+        const finishPosition = Math.floor(
+            youtubePlayer.getCurrentTime() || 0
+        );
+
+        try {
+            await sendFinalHeartbeat();
+
+            const { error } = await db.rpc(
+                "complete_video_watch_session",
+                {
+                    p_session_id: completedVideoSessionId,
+                    p_final_position_seconds: finishPosition
+                }
+            );
+
+            if (error) throw error;
+
+            currentSessionId = null;
+            youtubePlayer = null;
+
+            showMessage(
+                "Video completed. Starting your AI learning session...",
+                "#00c8ff"
+            );
+
+            await startAiLearningSession(
+                window.currentLearningVideoId
+            );
+
+        } catch (error) {
+            console.error("Video completion error:", error);
+
+            playerCompleted = false;
+            currentSessionId = completedVideoSessionId;
+            currentServiceId = completedService;
+
+            showMessage(
+                error.message ||
+                "Video completion could not be confirmed. Please try again."
+            );
+        }
     }
 
     async function startVideoSession(video) {
@@ -512,6 +683,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function showNoVideo(text) {
+        if (!videosList) return;
+
         videosList.innerHTML = "";
 
         const empty = document.createElement("div");
@@ -537,7 +710,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         youtubePlayer = null;
 
-        showNoVideo("Checking your Attendance and learning progress...");
+        showNoVideo("Checking your learning progress...");
 
         try {
             const { data, error } = await db.rpc(
@@ -553,7 +726,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!video) {
                 showNoVideo(
-                    "There is no published video for your current learning day. Please contact your administrator."
+                    "You have completed today's learning. Your next learning day will be available tomorrow."
                 );
 
                 return;
@@ -582,8 +755,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const day = document.createElement("p");
             day.className = "muted";
             day.style.marginTop = "8px";
-            day.textContent =
-                `Learning Day ${video.learning_day}`;
+            day.textContent = `Learning Day ${video.learning_day}`;
 
             const description = document.createElement("p");
             description.className = "muted video-description";
@@ -611,6 +783,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             videosList.innerHTML = "";
             videosList.appendChild(card);
+
+            window.currentLearningVideoId = video.video_id;
 
             await startVideoSession(video);
             await createVideoPlayer(video);
@@ -727,6 +901,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function sendAIQuestion(question, language = "rw") {
+        if (!currentAiSessionId || !aiExpiresAt) {
+            throw new Error(
+                "You can ask MENYARWANDA AI after completing your video."
+            );
+        }
+
+        if (Date.now() >= aiExpiresAt) {
+            setAIEnabled(false);
+            await finishAiLearningSession();
+
+            throw new Error(
+                "Your 10-minute AI learning session has ended."
+            );
+        }
+
         const { data: sessionData, error: sessionError } =
             await db.auth.getSession();
 
@@ -738,14 +927,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const response = await fetch("/api/chat", {
             method: "POST",
+
             headers: {
                 "Content-Type": "application/json",
                 "Authorization":
                     `Bearer ${sessionData.session.access_token}`
             },
+
             body: JSON.stringify({
                 question,
-                language
+                language,
+                ai_session_id: currentAiSessionId
             })
         });
 
@@ -760,6 +952,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (!response.ok) {
+            if (response.status === 403) {
+                setAIEnabled(false);
+                stopAiCountdown();
+            }
+
             throw new Error(
                 data.error || "MENYARWANDA AI connection failed."
             );
@@ -775,6 +972,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     if (aiForm) {
+        setAIEnabled(false);
+
+        if (aiStatus) {
+            aiStatus.textContent =
+                "Complete your learning video to unlock the 10-minute AI session.";
+        }
+
         aiForm.addEventListener("submit", async event => {
             event.preventDefault();
 
@@ -783,9 +987,21 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!question) return;
 
+            if (!currentAiSessionId) {
+                aiStatus.textContent =
+                    "Complete your video before asking MENYARWANDA AI.";
+                return;
+            }
+
             if (question.length > 5000) {
                 aiStatus.textContent =
                     "Your question is too long. Please shorten it.";
+                return;
+            }
+
+            if (Date.now() >= aiExpiresAt) {
+                setAIEnabled(false);
+                await finishAiLearningSession();
                 return;
             }
 
@@ -803,7 +1019,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 addAIMessage(answer, "assistant", language);
 
-                aiStatus.textContent = "MENYARWANDA AI is ready.";
+                if (currentAiSessionId && Date.now() < aiExpiresAt) {
+                    aiStatus.textContent =
+                        "MENYARWANDA AI is ready.";
+                }
 
             } catch (error) {
                 console.error("MENYARWANDA AI error:", error);
@@ -817,8 +1036,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                     error.message || "MENYARWANDA AI connection failed.";
 
             } finally {
-                aiSendButton.disabled = false;
                 aiSendButton.textContent = "Send";
+
+                if (
+                    currentAiSessionId &&
+                    Date.now() < aiExpiresAt
+                ) {
+                    aiSendButton.disabled = false;
+                    aiQuestion.disabled = false;
+                } else {
+                    setAIEnabled(false);
+                }
+
                 aiQuestion.focus();
             }
         });
@@ -883,6 +1112,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             logoutButton.textContent = "Logging out...";
 
             stopHeartbeat();
+            stopAiCountdown();
 
             const { error } = await db.auth.signOut();
 
