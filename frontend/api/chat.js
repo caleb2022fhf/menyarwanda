@@ -15,6 +15,11 @@ export default async function handler(req, res) {
             });
         }
 
+        const supabaseUrl = "https://ewqdwmrxklqglqkylxgo.supabase.co";
+        const supabaseKey =
+            process.env.SUPABASE_ANON_KEY ||
+            "sb_publishable_nx7hYVOX0Tz1-ewVTns7lw_WFwYrhDd";
+
         const authHeader = req.headers.authorization || "";
         const accessToken = authHeader.startsWith("Bearer ")
             ? authHeader.slice(7)
@@ -26,12 +31,13 @@ export default async function handler(req, res) {
             });
         }
 
+        // Verify the student's login
         const authResponse = await fetch(
-            "https://ewqdwmrxklqglqkylxgo.supabase.co/auth/v1/user",
+            `${supabaseUrl}/auth/v1/user`,
             {
                 headers: {
-                    "apikey": "sb_publishable_nx7hYVOX0Tz1-ewVTns7lw_WFwYrhDd",
-                    "Authorization": `Bearer ${accessToken}`
+                    apikey: supabaseKey,
+                    Authorization: `Bearer ${accessToken}`
                 }
             }
         );
@@ -42,7 +48,19 @@ export default async function handler(req, res) {
             });
         }
 
-        const { question, language = "rw" } = req.body || {};
+        const user = await authResponse.json();
+
+        if (!user?.id) {
+            return res.status(401).json({
+                error: "Unable to verify your account."
+            });
+        }
+
+        const {
+            question,
+            language = "rw",
+            ai_session_id
+        } = req.body || {};
 
         if (
             typeof question !== "string" ||
@@ -51,6 +69,56 @@ export default async function handler(req, res) {
         ) {
             return res.status(400).json({
                 error: "Please enter a valid question."
+            });
+        }
+
+        if (
+            typeof ai_session_id !== "string" ||
+            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ai_session_id)
+        ) {
+            return res.status(400).json({
+                error: "A valid AI learning session is required."
+            });
+        }
+
+        // Check that the student has an active AI session
+        // and that the 10-minute period has not expired.
+        const sessionParams = new URLSearchParams({
+            select: "id,student_id,video_id,service_id,expires_at,status",
+            id: `eq.${ai_session_id}`,
+            student_id: `eq.${user.id}`,
+            status: "eq.active",
+            expires_at: `gt.${new Date().toISOString()}`,
+            limit: "1"
+        });
+
+        const sessionResponse = await fetch(
+            `${supabaseUrl}/rest/v1/ai_learning_sessions?${sessionParams.toString()}`,
+            {
+                headers: {
+                    apikey: supabaseKey,
+                    Authorization: `Bearer ${accessToken}`,
+                    Accept: "application/json"
+                }
+            }
+        );
+
+        if (!sessionResponse.ok) {
+            console.error(
+                "AI session validation error:",
+                await sessionResponse.text()
+            );
+
+            return res.status(500).json({
+                error: "Could not verify your AI learning session."
+            });
+        }
+
+        const sessions = await sessionResponse.json();
+
+        if (!Array.isArray(sessions) || sessions.length === 0) {
+            return res.status(403).json({
+                error: "Your 10-minute AI learning session has expired or is not active."
             });
         }
 
@@ -65,49 +133,27 @@ export default async function handler(req, res) {
         const systemInstruction = `
 You are MENYARWANDA, a friendly and intelligent AI educational assistant.
 
-PERSONALITY:
-- Greet users naturally.
-- Be friendly, respectful and conversational.
-- Answer general knowledge questions.
-- Introduce yourself as MENYARWANDA when asked.
+CURRENT LEARNING SESSION:
+- The student has completed watching their assigned daily learning video.
+- The student is now in a 10-minute question and answer session.
+- Help the student understand things they did not hear, understand,
+  or remember from the video.
+- Answer questions clearly and patiently.
+- Give examples when they help explain the answer.
+- Do not generate quizzes, examinations, scores, or marks.
+- Do not tell the student that they have passed or failed.
+- If a question is unrelated to the learning video, politely guide
+  the student back to the topic of the video.
 
-YOUR ABILITIES:
-
-1. SCHOOL LEARNING:
-- Help students understand school subjects.
-- Explain mathematics, science, technology, languages and other subjects.
-- Provide examples and step-by-step explanations.
-- Create revision questions, exercises and answers.
-- Help students prepare for examinations.
-- Use simple explanations suitable for the learner.
-
-2. RWANDA DRIVING EDUCATION:
-- Explain Rwanda traffic laws and road signs.
-- Teach road safety and driving rules.
-- Help students prepare for driving examinations.
-- Never invent legal articles, fines or penalties.
-- Give priority to official Rwanda driving documents.
-- State clearly when an exact legal rule is uncertain.
-
-3. AGRICULTURE:
-- Explain crop production, planting, irrigation, soil fertility,
-  fertilizers, pests, diseases, harvesting and storage.
-- Give practical advice relevant to Rwanda and East Africa.
-- Never invent pesticide doses or fertilizer application rates.
-
-4. LIVESTOCK:
-- Explain cattle, goats, sheep, pigs, poultry, rabbits,
-  fish farming and beekeeping.
-- Explain feeding, breeding, housing and disease prevention.
-- Recommend a veterinarian for serious animal diseases.
-- Never invent veterinary medicine dosages.
-
-5. AGRICULTURAL BUSINESS:
-- Help users plan farming projects.
-- Explain budgets, production costs, marketing and profitability.
+YOUR KNOWLEDGE:
+- Explain school subjects, mathematics, science and technology.
+- Explain Rwanda traffic laws, road signs and road safety.
+- Explain agriculture, crop production and livestock.
+- Give practical explanations relevant to Rwanda and East Africa.
 
 ACCURACY:
-- Never invent facts, laws, statistics or medical/veterinary doses.
+- Never invent facts, laws, statistics or legal penalties.
+- Never invent medical or veterinary medicine dosages.
 - Be honest when information is uncertain.
 - Ask a useful clarification when necessary.
 
@@ -120,6 +166,7 @@ IMPORTANT:
 - Answer only the current question.
 - Do not assume access to previous conversations.
 - Do not claim that conversations are saved.
+- Do not create quizzes or give marks.
 `;
 
         const geminiResponse = await fetch(
