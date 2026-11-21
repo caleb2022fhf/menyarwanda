@@ -34,13 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const { data: profile, error: profileError } = await db
                 .from("profiles")
-                .select("role")
+                .select("role, is_allowed")
                 .eq("id", data.user.id)
                 .single();
 
             if (profileError || !profile) {
                 await db.auth.signOut();
-                throw new Error("Unable to verify your account role.");
+                throw new Error("Unable to verify your account.");
             }
 
             if (profile.role === "admin") {
@@ -49,6 +49,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             if (profile.role === "student") {
+                if (profile.is_allowed !== true) {
+                    await db.auth.signOut();
+                    throw new Error(
+                        "Your account access has not been approved. Please contact the administrator."
+                    );
+                }
+
                 const { data: sessionData, error: sessionError } =
                     await db.rpc("start_student_learning_session");
 
