@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const email = document.getElementById("email").value.trim();
         const pin = document.getElementById("pin").value;
-
         const db = window.MENYARWANDA_DB;
 
         if (!db) {
@@ -46,12 +45,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (profile.role === "admin") {
                 window.location.replace("admin.html");
-            } else if (profile.role === "student") {
-                window.location.replace("dashboard.html");
-            } else {
-                await db.auth.signOut();
-                throw new Error("Your account role is not recognized.");
+                return;
             }
+
+            if (profile.role === "student") {
+                const { data: sessionData, error: sessionError } =
+                    await db.rpc("start_student_learning_session");
+
+                if (sessionError) {
+                    await db.auth.signOut();
+                    throw sessionError;
+                }
+
+                if (!sessionData || sessionData.length === 0) {
+                    await db.auth.signOut();
+                    throw new Error(
+                        "Unable to start your 40-minute learning session."
+                    );
+                }
+
+                window.location.replace("dashboard.html");
+                return;
+            }
+
+            await db.auth.signOut();
+            throw new Error("Your account role is not recognized.");
 
         } catch (error) {
             loginMessage.textContent =
