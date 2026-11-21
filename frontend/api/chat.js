@@ -16,11 +16,13 @@ export default async function handler(req, res) {
         }
 
         const supabaseUrl = "https://ewqdwmrxklqglqkylxgo.supabase.co";
+
         const supabaseKey =
             process.env.SUPABASE_ANON_KEY ||
             "sb_publishable_nx7hYVOX0Tz1-ewVTns7lw_WFwYrhDd";
 
         const authHeader = req.headers.authorization || "";
+
         const accessToken = authHeader.startsWith("Bearer ")
             ? authHeader.slice(7)
             : "";
@@ -58,8 +60,7 @@ export default async function handler(req, res) {
 
         const {
             question,
-            language = "rw",
-            ai_session_id
+            language = "rw"
         } = req.body || {};
 
         if (
@@ -72,53 +73,44 @@ export default async function handler(req, res) {
             });
         }
 
-        if (
-            typeof ai_session_id !== "string" ||
-            !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ai_session_id)
-        ) {
-            return res.status(400).json({
-                error: "A valid AI learning session is required."
-            });
-        }
-
-        // Check that the student has an active AI session
-        // and that the 10-minute period has not expired.
-        const sessionParams = new URLSearchParams({
-            select: "id,student_id,video_id,service_id,expires_at,status",
-            id: `eq.${ai_session_id}`,
-            student_id: `eq.${user.id}`,
-            status: "eq.active",
-            expires_at: `gt.${new Date().toISOString()}`,
-            limit: "1"
-        });
-
+        // Verify the student's 40-minute server-side learning session
         const sessionResponse = await fetch(
-            `${supabaseUrl}/rest/v1/ai_learning_sessions?${sessionParams.toString()}`,
+            `${supabaseUrl}/rest/v1/rpc/get_my_learning_session`,
             {
+                method: "POST",
                 headers: {
                     apikey: supabaseKey,
                     Authorization: `Bearer ${accessToken}`,
-                    Accept: "application/json"
-                }
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
             }
         );
 
         if (!sessionResponse.ok) {
             console.error(
-                "AI session validation error:",
+                "Learning session validation error:",
                 await sessionResponse.text()
             );
 
-            return res.status(500).json({
-                error: "Could not verify your AI learning session."
+            return res.status(403).json({
+                error: "Your learning session could not be verified. Please login again."
             });
         }
 
-        const sessions = await sessionResponse.json();
+        const sessionData = await sessionResponse.json();
 
-        if (!Array.isArray(sessions) || sessions.length === 0) {
+        const session = Array.isArray(sessionData)
+            ? sessionData[0]
+            : sessionData;
+
+        if (
+            !session ||
+            session.session_status !== "active" ||
+            Number(session.remaining_seconds) <= 0
+        ) {
             return res.status(403).json({
-                error: "Your 10-minute AI learning session has expired or is not active."
+                error: "Your 40-minute learning session has expired. Please come back tomorrow."
             });
         }
 
@@ -134,39 +126,42 @@ export default async function handler(req, res) {
 You are MENYARWANDA, a friendly and intelligent AI educational assistant.
 
 CURRENT LEARNING SESSION:
-- The student has completed watching their assigned daily learning video.
-- The student is now in a 10-minute question and answer session.
-- Help the student understand things they did not hear, understand,
-  or remember from the video.
+
+- The student has an active 40-minute learning session.
+- The session starts when the student successfully logs in.
+- The student can ask questions throughout the entire session.
+- The student does NOT need to watch or complete a video before asking questions.
+- Help the student learn, understand and practice educational topics.
 - Answer questions clearly and patiently.
 - Give examples when they help explain the answer.
-- Do not generate quizzes, examinations, scores, or marks.
-- Do not tell the student that they have passed or failed.
-- If a question is unrelated to the learning video, politely guide
-  the student back to the topic of the video.
 
 YOUR KNOWLEDGE:
+
 - Explain school subjects, mathematics, science and technology.
 - Explain Rwanda traffic laws, road signs and road safety.
 - Explain agriculture, crop production and livestock.
 - Give practical explanations relevant to Rwanda and East Africa.
 
 ACCURACY:
+
 - Never invent facts, laws, statistics or legal penalties.
 - Never invent medical or veterinary medicine dosages.
 - Be honest when information is uncertain.
 - Ask a useful clarification when necessary.
 
 LANGUAGE:
+
 - Always respond in ${selectedLanguage}.
 - Use clear and natural language.
 - Do not change language unless requested.
 
 IMPORTANT:
+
 - Answer only the current question.
 - Do not assume access to previous conversations.
 - Do not claim that conversations are saved.
-- Do not create quizzes or give marks.
+- Do not claim that the student must complete a video first.
+- Do not create quizzes or give marks unless the student asks for learning exercises.
 `;
 
         const geminiResponse = await fetch(
