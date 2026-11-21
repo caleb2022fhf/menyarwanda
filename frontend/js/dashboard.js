@@ -21,17 +21,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     let currentUser = null;
     let currentServiceId = null;
     let currentSessionId = null;
-    let currentAiSessionId = null;
-    let aiExpiresAt = null;
+
+    let learningExpiresAt = null;
+    let learningCountdownTimer = null;
+    let learningSessionExpired = false;
+    let loggingOut = false;
 
     let youtubePlayer = null;
     let heartbeatTimer = null;
-    let aiCountdownTimer = null;
 
     let playerCompleted = false;
     let loadingService = false;
-    let finishingAiSession = false;
-    let lastFinishAttempt = 0;
 
     function showMessage(text, color = "#ff5555") {
         if (!message) return;
@@ -52,6 +52,123 @@ document.addEventListener("DOMContentLoaded", async () => {
     function setAIEnabled(enabled) {
         if (aiQuestion) aiQuestion.disabled = !enabled;
         if (aiSendButton) aiSendButton.disabled = !enabled;
+    }
+
+    function stopLearningCountdown() {
+        if (learningCountdownTimer) {
+            clearInterval(learningCountdownTimer);
+            learningCountdownTimer = null;
+        }
+    }
+
+    async function forceLearningLogout(reason) {
+        if (loggingOut) return;
+
+        loggingOut = true;
+        learningSessionExpired = true;
+
+        stopLearningCountdown();
+        stopHeartbeat();
+        setAIEnabled(false);
+
+        if (aiStatus) {
+            aiStatus.textContent = reason ||
+                "Your 40-minute learning session has ended. You have been logged out.";
+        }
+
+        try {
+            await db.auth.signOut();
+        } catch (error) {
+            console.error("Automatic logout error:", error);
+        }
+
+        window.location.replace("login.html");
+    }
+
+    function updateLearningCountdown() {
+        if (!learningExpiresAt || learningSessionExpired) return;
+
+        const remaining = Math.max(
+            0,
+            Math.ceil((learningExpiresAt - Date.now()) / 1000)
+        );
+
+        const minutes = Math.floor(remaining / 60);
+        const seconds = remaining % 60;
+
+        const countdownText =
+            `${String(minutes).padStart(2, "0")}:` +
+            `${String(seconds).padStart(2, "0")}`;
+
+        if (aiStatus) {
+            aiStatus.textContent = remaining > 0
+                ? `MENYARWANDA AI is active. Time remaining: ${countdownText}`
+                : "Your 40-minute learning session has ended. Logging out...";
+        }
+
+        const display = document.getElementById("learning-countdown-display");
+
+        if (display) {
+            display.textContent = countdownText;
+        }
+
+        if (remaining <= 0) {
+            forceLearningLogout(
+                "Your 40-minute learning session has ended. You have been logged out."
+            );
+        }
+    }
+
+    function startLearningCountdown(remainingSeconds) {
+        stopLearningCountdown();
+
+        const seconds = Math.max(0, Number(remainingSeconds) || 0);
+
+        learningExpiresAt = Date.now() + seconds * 1000;
+        learningSessionExpired = false;
+
+        if (seconds <= 0) {
+            forceLearningLogout(
+                "Your learning session has expired. You can log in again tomorrow."
+            );
+            return;
+        }
+
+        setAIEnabled(true);
+        updateLearningCountdown();
+
+        learningCountdownTimer = setInterval(() => {
+            updateLearningCountdown();
+        }, 1000);
+    }
+
+    async function loadMyLearningSession() {
+        const { data, error } = await db.rpc("get_my_learning_session");
+
+        if (error) throw error;
+
+        const session = Array.isArray(data) ? data[0] : data;
+
+        if (
+            !session ||
+            session.session_status !== "active" ||
+            Number(session.remaining_seconds) <= 0
+        ) {
+            await forceLearningLogout(
+                "Your 40-minute learning session is not active. You can log in again tomorrow."
+            );
+
+            return false;
+        }
+
+        startLearningCountdown(session.remaining_seconds);
+
+        if (aiStatus) {
+            aiStatus.textContent =
+                "MENYARWANDA AI is ready. You can ask questions at any time during your 40-minute session.";
+        }
+
+        return true;
     }
 
     function addAIMessage(text, sender = "assistant", language = "rw") {
@@ -82,6 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     await speakAIMessage(text, language);
                 } catch (error) {
                     console.error("Voice error:", error);
+
                     if (aiStatus) {
                         aiStatus.textContent =
                             "Unable to play the voice. Please try again.";
@@ -112,6 +230,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         sentences.forEach(sentence => {
             const cleanSentence = sentence.trim();
+
             if (!cleanSentence) return;
 
             const next = current
@@ -177,6 +296,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     audio.onerror = () => reject(
                         new Error("Voice playback failed.")
                     );
+
                     audio.play().catch(reject);
                 });
             }
@@ -264,6 +384,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 if (typeof oldCallback === "function") {
                     oldCallback();
                 }
+
                 resolve();
             };
 
@@ -277,6 +398,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 script.onerror = () => reject(
                     new Error("Unable to load YouTube Player API.")
                 );
+
                 document.head.appendChild(script);
             }
 
@@ -294,13 +416,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (heartbeatTimer) {
             clearInterval(heartbeatTimer);
             heartbeatTimer = null;
-        }
-    }
-
-    function stopAiCountdown() {
-        if (aiCountdownTimer) {
-            clearInterval(aiCountdownTimer);
-            aiCountdownTimer = null;
         }
     }
 
@@ -333,6 +448,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (error) {
                 console.error("Heartbeat error:", error);
             }
+
         } catch (error) {
             console.error("Heartbeat error:", error);
         }
@@ -376,178 +492,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         }, 15000);
     }
 
-    function showAiLearningPanel() {
+    function showVideoCompletedMessage() {
         if (!videosList) return;
 
         videosList.innerHTML = `
             <div class="card empty-state">
                 <h3>Video completed successfully!</h3>
-                <p>Your 10-minute MENYARWANDA AI learning session has started.</p>
-                <p>Ask questions about anything you did not understand in the video.</p>
-                <h3 id="ai-countdown-display"
-                    style="color:#00c8ff;margin-top:18px;">
-                    10:00
-                </h3>
+                <p>You can continue asking MENYARWANDA AI questions during your active 40-minute learning session.</p>
             </div>
         `;
-    }
-
-    function updateAiCountdown() {
-        if (!currentAiSessionId || !aiExpiresAt) return;
-
-        const remaining = Math.max(
-            0,
-            Math.ceil((aiExpiresAt - Date.now()) / 1000)
-        );
-
-        const minutes = Math.floor(remaining / 60);
-        const seconds = remaining % 60;
-
-        const display = document.getElementById("ai-countdown-display");
-
-        const countdownText =
-            `${String(minutes).padStart(2, "0")}:` +
-            `${String(seconds).padStart(2, "0")}`;
-
-        if (display) {
-            display.textContent = countdownText;
-        }
-
-        if (aiStatus) {
-            aiStatus.textContent =
-                remaining > 0
-                    ? `MENYARWANDA AI session time remaining: ${countdownText}`
-                    : "Your AI learning time has ended. Submitting attendance...";
-        }
-
-        if (remaining <= 0) {
-            setAIEnabled(false);
-
-            if (
-                !finishingAiSession &&
-                Date.now() - lastFinishAttempt > 5000
-            ) {
-                finishAiLearningSession();
-            }
-        }
-    }
-
-    async function startAiCountdown(expiresAt) {
-        stopAiCountdown();
-
-        aiExpiresAt = new Date(expiresAt).getTime();
-
-        if (!Number.isFinite(aiExpiresAt)) {
-            throw new Error("Invalid AI session expiry time.");
-        }
-
-        setAIEnabled(true);
-
-        if (aiStatus) {
-            aiStatus.textContent =
-                "Your 10-minute MENYARWANDA AI session is active.";
-        }
-
-        updateAiCountdown();
-
-        aiCountdownTimer = setInterval(() => {
-            updateAiCountdown();
-        }, 1000);
-    }
-
-    async function finishAiLearningSession() {
-        if (!currentAiSessionId || finishingAiSession) return;
-
-        if (Date.now() < aiExpiresAt) return;
-
-        finishingAiSession = true;
-        lastFinishAttempt = Date.now();
-
-        setAIEnabled(false);
-
-        try {
-            const { data, error } = await db.rpc(
-                "finish_ai_learning_session",
-                {
-                    p_session_id: currentAiSessionId
-                }
-            );
-
-            if (error) throw error;
-
-            if (data !== true) {
-                throw new Error(
-                    "Attendance could not be confirmed."
-                );
-            }
-
-            stopAiCountdown();
-
-            currentAiSessionId = null;
-            aiExpiresAt = null;
-
-            if (aiStatus) {
-                aiStatus.textContent =
-                    "Your 10-minute session is complete. Your attendance has been recorded.";
-            }
-
-            addAIMessage(
-                "Your 10-minute learning session is complete. Your attendance has been recorded. You can continue learning when the next day arrives.",
-                "assistant",
-                "rw"
-            );
-
-            showMessage(
-                "Your attendance has been recorded successfully.",
-                "#00c8ff"
-            );
-
-            const completedService = currentServiceId;
-
-            await loadServiceVideo(completedService);
-
-        } catch (error) {
-            console.error("AI session completion error:", error);
-
-            if (aiStatus) {
-                aiStatus.textContent =
-                    "Attendance submission failed. Retrying automatically...";
-            }
-
-        } finally {
-            finishingAiSession = false;
-        }
-    }
-
-    async function startAiLearningSession(videoId) {
-        const { data, error } = await db.rpc(
-            "start_ai_learning_session",
-            {
-                p_video_id: videoId
-            }
-        );
-
-        if (error) throw error;
-
-        const session = Array.isArray(data) ? data[0] : data;
-
-        if (!session || !session.session_id || !session.expires_at) {
-            throw new Error(
-                "MENYARWANDA AI session could not be started."
-            );
-        }
-
-        currentAiSessionId = session.session_id;
-
-        showAiLearningPanel();
-
-        addAIMessage(
-            "Congratulations! You have completed the video. You now have 10 minutes to ask me questions about the lesson. What would you like me to explain?",
-            "assistant",
-            "rw"
-        );
-
-        await startAiCountdown(session.expires_at);
     }
 
     async function completeCurrentVideo() {
@@ -582,13 +535,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             youtubePlayer = null;
 
             showMessage(
-                "Video completed. Starting your AI learning session...",
+                "Video completed successfully. MENYARWANDA AI remains available during your 40-minute session.",
                 "#00c8ff"
             );
 
-            await startAiLearningSession(
-                window.currentLearningVideoId
-            );
+            showVideoCompletedMessage();
 
         } catch (error) {
             console.error("Video completion error:", error);
@@ -901,19 +852,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     async function sendAIQuestion(question, language = "rw") {
-        if (!currentAiSessionId || !aiExpiresAt) {
+        if (learningSessionExpired || !learningExpiresAt) {
             throw new Error(
-                "You can ask MENYARWANDA AI after completing your video."
+                "Your 40-minute learning session is not active. Please log in again."
             );
         }
 
-        if (Date.now() >= aiExpiresAt) {
-            setAIEnabled(false);
-            await finishAiLearningSession();
-
-            throw new Error(
-                "Your 10-minute AI learning session has ended."
+        if (Date.now() >= learningExpiresAt) {
+            await forceLearningLogout(
+                "Your 40-minute learning session has ended. You have been logged out."
             );
+
+            throw new Error("Your learning session has ended.");
         }
 
         const { data: sessionData, error: sessionError } =
@@ -936,8 +886,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             body: JSON.stringify({
                 question,
-                language,
-                ai_session_id: currentAiSessionId
+                language
             })
         });
 
@@ -953,8 +902,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!response.ok) {
             if (response.status === 403) {
-                setAIEnabled(false);
-                stopAiCountdown();
+                await forceLearningLogout(
+                    "Your 40-minute learning session has expired. You have been logged out."
+                );
             }
 
             throw new Error(
@@ -976,7 +926,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (aiStatus) {
             aiStatus.textContent =
-                "Complete your learning video to unlock the 10-minute AI session.";
+                "MENYARWANDA AI will be available during your 40-minute learning session.";
         }
 
         aiForm.addEventListener("submit", async event => {
@@ -987,21 +937,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             if (!question) return;
 
-            if (!currentAiSessionId) {
-                aiStatus.textContent =
-                    "Complete your video before asking MENYARWANDA AI.";
-                return;
-            }
-
             if (question.length > 5000) {
                 aiStatus.textContent =
                     "Your question is too long. Please shorten it.";
+
                 return;
             }
 
-            if (Date.now() >= aiExpiresAt) {
-                setAIEnabled(false);
-                await finishAiLearningSession();
+            if (!learningExpiresAt || Date.now() >= learningExpiresAt) {
+                await forceLearningLogout(
+                    "Your 40-minute learning session has ended. You have been logged out."
+                );
+
                 return;
             }
 
@@ -1019,7 +966,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 addAIMessage(answer, "assistant", language);
 
-                if (currentAiSessionId && Date.now() < aiExpiresAt) {
+                if (!learningSessionExpired && Date.now() < learningExpiresAt) {
                     aiStatus.textContent =
                         "MENYARWANDA AI is ready.";
                 }
@@ -1039,8 +986,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 aiSendButton.textContent = "Send";
 
                 if (
-                    currentAiSessionId &&
-                    Date.now() < aiExpiresAt
+                    !learningSessionExpired &&
+                    learningExpiresAt &&
+                    Date.now() < learningExpiresAt
                 ) {
                     aiSendButton.disabled = false;
                     aiQuestion.disabled = false;
@@ -1103,6 +1051,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             headings[1].textContent = "My Next Learning Video";
         }
 
+        const learningSessionActive = await loadMyLearningSession();
+
+        if (!learningSessionActive || loggingOut) return;
+
         await loadCourses(currentUser.id);
 
         showMessage("Your dashboard is ready.", "#00c8ff");
@@ -1112,7 +1064,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             logoutButton.textContent = "Logging out...";
 
             stopHeartbeat();
-            stopAiCountdown();
+            stopLearningCountdown();
 
             const { error } = await db.auth.signOut();
 
